@@ -7,6 +7,9 @@
     "res://content/levels/05_make_a_stop.json",
     "res://content/levels/06_clear_your_corner.json",
     "res://content/levels/07_hold_the_gate.json",
-    "res://content/levels/08_tag_team.json"
+    "res://content/levels/08_tag_team.json",
+    "res://content/levels/09_borrowed_brake.json",
+    "res://content/levels/10_cross_circuit.json",
+    "res://content/levels/11_second_shift.json"
   ]
 }

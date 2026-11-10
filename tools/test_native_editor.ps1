@@ -34,7 +34,7 @@ $reportPath = Join-Path $evidence 'native_editor_report.json'
 if (Test-Path -LiteralPath $reportPath) { Remove-Item -LiteralPath $reportPath -Force }
 $run = Start-Process -FilePath $portable -ArgumentList @('--editor','--path',('"'+$qaRoot+'"'),'--position','-2400,-2400','--resolution','1800x1100','--log-file',('"'+$log+'"'),'--','--kuro-workbench','--kuro-native-smoke') -WindowStyle Normal -PassThru
 $exited = $false
-for ($attempt=0; $attempt -lt 3; $attempt++) {
+for ($attempt=0; $attempt -lt 4; $attempt++) {
     if ($run.WaitForExit(30000)) { $exited = $true; break }
     Write-Output 'Waiting for the isolated native editor test...'
 }

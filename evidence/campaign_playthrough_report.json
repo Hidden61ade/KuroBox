@@ -1,0 +1,144 @@
+{
+	"checks": 426,
+	"display_driver": "Windows",
+	"engine": "4.6-stable (official)",
+	"failures": [],
+	"input_source": "Input.parse_input_event through the actual main scene",
+	"isolated_profile": true,
+	"published_campaign": [
+		{
+			"commands": 2,
+			"id": "round_01",
+			"moves": 2,
+			"punches": 0,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 6,
+			"id": "round_02",
+			"moves": 6,
+			"punches": 0,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 1,
+			"id": "round_03",
+			"moves": 1,
+			"punches": 1,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 4,
+			"id": "round_04",
+			"moves": 3,
+			"punches": 1,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 13,
+			"id": "round_05",
+			"moves": 12,
+			"punches": 1,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 5,
+			"id": "round_06",
+			"moves": 4,
+			"punches": 1,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 10,
+			"id": "round_07",
+			"moves": 9,
+			"punches": 2,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 15,
+			"id": "round_08",
+			"moves": 15,
+			"punches": 2,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 44,
+			"id": "round_09",
+			"moves": 43,
+			"punches": 3,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 83,
+			"id": "round_10",
+			"moves": 77,
+			"punches": 10,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		},
+		{
+			"commands": 117,
+			"id": "round_11",
+			"moves": 110,
+			"punches": 14,
+			"viewport": [
+				1280,
+				720
+			],
+			"won": true
+		}
+	],
+	"screenshots": [
+		"res://evidence/campaign_level_select.webp",
+		"res://evidence/campaign_05_start.webp",
+		"res://evidence/campaign_05_mobile_brake.webp",
+		"res://evidence/campaign_07_start.webp",
+		"res://evidence/campaign_07_released_gate.webp",
+		"res://evidence/campaign_08_start.webp",
+		"res://evidence/campaign_08_handoff.webp",
+		"res://evidence/campaign_09_start.webp",
+		"res://evidence/campaign_10_start.webp",
+		"res://evidence/campaign_11_start.webp",
+		"res://evidence/campaign_final_960.webp"
+	]
+}

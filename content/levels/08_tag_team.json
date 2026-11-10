@@ -2,10 +2,14 @@
   "schema_version": 1,
   "id": "round_08",
   "title": "TAG TEAM",
-  "width": 10,
+  "width": 9,
   "height": 7,
   "floor": [
     [
+      1,
+      1
+    ],
+    [
       2,
       1
     ],
@@ -27,10 +31,6 @@
     ],
     [
       7,
-      1
-    ],
-    [
-      8,
       1
     ],
     [
@@ -62,10 +62,6 @@
       2
     ],
     [
-      8,
-      2
-    ],
-    [
       1,
       3
     ],
@@ -94,10 +90,6 @@
       3
     ],
     [
-      8,
-      3
-    ],
-    [
       1,
       4
     ],
@@ -123,10 +115,6 @@
     ],
     [
       7,
-      4
-    ],
-    [
-      8,
       4
     ],
     [
@@ -160,35 +148,35 @@
   ],
   "walls": [
     [
-      5,
+      4,
       1
     ],
     [
-      5,
+      4,
       2
     ],
     [
-      5,
+      4,
       4
     ],
     [
-      5,
+      4,
       5
     ]
   ],
   "goals": [
     [
-      8,
+      7,
       3
     ],
     [
-      7,
+      6,
       3
     ]
   ],
   "player": [
-    3,
-    2
+    2,
+    3
   ],
   "facing": [
     1,
@@ -199,8 +187,8 @@
       "id": "wood_01",
       "type": "wood",
       "cell": [
-        3,
-        3
+        2,
+        2
       ],
       "targets": []
     },
@@ -208,7 +196,7 @@
       "id": "bag_01",
       "type": "bag",
       "cell": [
-        4,
+        3,
         3
       ],
       "targets": []
@@ -217,8 +205,8 @@
       "id": "plate_left",
       "type": "plate",
       "cell": [
-        3,
-        4
+        2,
+        2
       ],
       "targets": [
         "gate_mid"
@@ -228,7 +216,7 @@
       "id": "plate_right",
       "type": "plate",
       "cell": [
-        8,
+        7,
         3
       ],
       "targets": [
@@ -239,7 +227,7 @@
       "id": "gate_mid",
       "type": "door",
       "cell": [
-        5,
+        4,
         3
       ],
       "targets": []
@@ -250,21 +238,17 @@
     "hint": "",
     "concept": "Pass gate duty to the delivered bag, then recover the wood box.",
     "solution": [
-      "D",
-      "R",
       "P",
       "R",
       "R",
       "P",
       "L",
-      "L",
-      "L",
-      "D",
-      "D",
-      "R",
+      "U",
       "U",
       "L",
-      "U",
+      "D",
+      "L",
+      "D",
       "R",
       "R",
       "R",

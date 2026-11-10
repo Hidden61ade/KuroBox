@@ -8,6 +8,8 @@ const Editor = preload("res://features/editor/level_editor.gd")
 const Backdrop = preload("res://features/shell/scrolling_backdrop.gd")
 const Transition = preload("res://features/shell/stripe_transition.gd")
 const Footer = preload("res://features/play/hud_footer.gd")
+const Commands = preload("res://features/play/command_buffer.gd")
+const DIRECTION_KEYS := {KEY_W: Vector2i.UP, KEY_UP: Vector2i.UP, KEY_S: Vector2i.DOWN, KEY_DOWN: Vector2i.DOWN, KEY_A: Vector2i.LEFT, KEY_LEFT: Vector2i.LEFT, KEY_D: Vector2i.RIGHT, KEY_RIGHT: Vector2i.RIGHT}
 
 var profile: ProfileStore
 var audio: AudioService
@@ -30,6 +32,8 @@ var _notice_label: Label
 var _import_dialog: FileDialog
 var _transition: StripeTransition
 var _hud_footer: HudFooter
+var _commands := Commands.new()
+var _held_direction_key: int = 0
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
@@ -76,8 +80,7 @@ func _load_campaign() -> void:
 
 func _clear_content() -> void:
 	_close_modal()
-	_generation += 1
-	_busy = false
+	_cancel_pending_commands()
 	for child: Node in _content.get_children():
 		if child == editor:
 			_content.remove_child(child)
@@ -162,6 +165,7 @@ func _icon(key: String, hint: String, callback: Callable, extent: int = 64, navi
 
 func _navigate(callback: Callable) -> void:
 	if _transition != null and not _transition.busy:
+		_cancel_pending_commands()
 		_transition.play(callback)
 
 func _toggle_sound() -> void:
@@ -298,6 +302,15 @@ func _update_hud() -> void:
 	if is_instance_valid(_actions_label) and board != null:
 		_actions_label.text = "%02d 步  /  %02d 拳" % [board.moves, board.punches]
 
+func _input(event: InputEvent) -> void:
+	# Release must reach us even if a newly focused UI consumes keyboard input.
+	if event is InputEventKey and not event.pressed:
+		var key: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+		if DIRECTION_KEYS.has(key):
+			_commands.remove_repeats(key)
+			if _held_direction_key == key:
+				_held_direction_key = 0
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed:
 		return
@@ -330,11 +343,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	if current_screen != "play" or _modal != null:
 		return
+	if DIRECTION_KEYS.has(key):
+		if not _can_receive_command():
+			return
+		if event.echo and _held_direction_key != key:
+			return
+		if not event.echo:
+			_held_direction_key = key
+		perform_move(DIRECTION_KEYS[key], event.echo, key)
+		get_viewport().set_input_as_handled()
+		return
 	match key:
-		KEY_W, KEY_UP: perform_move(Vector2i.UP)
-		KEY_S, KEY_DOWN: perform_move(Vector2i.DOWN)
-		KEY_A, KEY_LEFT: perform_move(Vector2i.LEFT)
-		KEY_D, KEY_RIGHT: perform_move(Vector2i.RIGHT)
 		KEY_SPACE: punch_action()
 		KEY_Z: undo_action()
 		KEY_R: restart_level()
@@ -342,20 +361,46 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		_: return
 	get_viewport().set_input_as_handled()
 
-func perform_move(direction: Vector2i) -> void:
-	if not _can_act():
+func perform_move(direction: Vector2i, repeat: bool = false, key: int = 0) -> void:
+	if not _can_receive_command():
 		return
-	var before := board.snapshot()
-	_perform_result(board.step(direction), before)
+	_commands.push({"kind": "move", "direction": direction, "repeat": repeat, "key": key})
+	_drain_commands()
 
 func punch_action() -> void:
-	if not _can_act():
+	if not _can_receive_command():
 		return
-	var before := board.snapshot()
-	_perform_result(board.punch(), before)
+	_commands.push({"kind": "punch", "repeat": false})
+	_drain_commands()
+
+func _can_receive_command() -> bool:
+	return current_screen == "play" and _modal == null and not _quitting and board != null and not board.is_won() and is_instance_valid(board_view) and (_transition == null or not _transition.busy)
 
 func _can_act() -> bool:
-	return current_screen == "play" and _modal == null and not _busy and board != null and not board.is_won()
+	return _can_receive_command() and not _busy
+
+func _drain_commands() -> void:
+	if not _can_act():
+		return
+	while _commands.size() > 0:
+		var command := _commands.take_next()
+		var before := board.snapshot()
+		var result: Dictionary = board.step(command.direction) if command.kind == "move" else board.punch()
+		if result.get("changed", false):
+			_perform_result(result, before)
+			return
+		# A collision can still turn the boxer (and create a core undo entry).
+		# Settle that result in order, without adding an artificial input lock.
+		board_view.animate_result(result, before)
+		_update_hud()
+
+func _cancel_pending_commands() -> void:
+	_commands.clear()
+	_held_direction_key = 0
+	_generation += 1
+	_busy = false
+	if is_instance_valid(board_view):
+		board_view.stop_animation()
 
 func _perform_result(result: Dictionary, before: Dictionary) -> void:
 	board_view.animate_result(result, before)
@@ -364,19 +409,24 @@ func _perform_result(result: Dictionary, before: Dictionary) -> void:
 		audio.play_event("punch" if result.get("event") == "punch" else "place")
 	_busy = true
 	var session := _generation
+	var current_board := board
+	if board.is_won():
+		_commands.clear()
+		_held_direction_key = 0
 	await get_tree().create_timer(0.19 if result.get("event") == "punch" else 0.11).timeout
-	if session != _generation:
+	if session != _generation or board != current_board or not is_instance_valid(board_view):
 		return
 	_busy = false
 	if board.is_won() and _modal == null:
 		show_completion()
+	else:
+		_drain_commands()
 
 func undo_action() -> void:
 	if current_screen != "play" or board == null:
 		return
 	_close_modal()
-	_generation += 1
-	_busy = false
+	_cancel_pending_commands()
 	if board.undo():
 		board_view.stop_animation()
 		_update_hud()
@@ -387,8 +437,7 @@ func restart_level() -> void:
 	if current_screen != "play" or board == null:
 		return
 	_close_modal()
-	_generation += 1
-	_busy = false
+	_cancel_pending_commands()
 	board.restart()
 	board_view.stop_animation()
 	_update_hud()
@@ -402,6 +451,7 @@ func _leave_play() -> void:
 		show_level_select()
 
 func _modal_column(minimum_width: int = 430) -> VBoxContainer:
+	_cancel_pending_commands()
 	_close_modal()
 	_modal = Control.new()
 	_modal.name = "Modal"
@@ -601,6 +651,7 @@ func import_level() -> void:
 	_import_dialog.popup_centered_ratio(0.75)
 
 func _exit_tree() -> void:
+	_cancel_pending_commands()
 	if is_instance_valid(editor) and editor.get_parent() == null:
 		editor.free()
 
@@ -621,6 +672,7 @@ func request_quit() -> void:
 		_finish_quit()
 
 func _finish_quit() -> void:
+	_cancel_pending_commands()
 	_quitting = true
 	audio.shutdown()
 	await get_tree().create_timer(0.3).timeout

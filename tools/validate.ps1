@@ -10,7 +10,7 @@ $engineVersion = & $GodotBin --version
 if ($engineVersion -notmatch '^4\.6\.') { throw "Godot 4.6 is required. Found: $engineVersion" }
 $evidenceRoot = Join-Path $projectRoot 'evidence'
 New-Item -ItemType Directory -Path $evidenceRoot -Force | Out-Null
-$jobs = @('import','core','parameters','replay','workspace','editor','editor_workbench','recovery','profile','assets','transition','flow','hud_footer')
+$jobs = @('import','core','parameters','replay','workspace','editor','editor_workbench','recovery','profile','assets','transition','flow','hud_footer','level_design','advanced_levels','rapid_input')
 foreach ($job in $jobs) {
     $logPath = Join-Path $evidenceRoot ($job + '_validation.log')
     if ($job -eq 'import') {

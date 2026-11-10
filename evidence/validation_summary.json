@@ -2,9 +2,9 @@
   "date": "2026-11-10",
   "engine": "4.6.stable.official.89cea1439",
   "automated_checks": {
-    "core": 166,
+    "core": 187,
     "parameters": 95,
-    "replay": 38,
+    "replay": 44,
     "workspace": 102,
     "editor": 54,
     "editor_workbench": 54,
@@ -14,9 +14,13 @@
     "transition": 32,
     "flow": 28,
     "hud_footer": 81,
-    "native_editor": 46
+    "level_design": 33,
+    "advanced_levels": 60,
+    "rapid_input": 39,
+    "native_editor": 46,
+    "campaign_playthrough": 426
   },
-  "total_checks": 778,
+  "total_checks": 1363,
   "failures": [],
   "campaign": [
     {
@@ -62,17 +66,38 @@
       "won": true
     },
     {
-      "commands": 6,
+      "commands": 10,
       "id": "round_07",
-      "moves": 5,
+      "moves": 9,
       "punches": 2,
       "won": true
     },
     {
-      "commands": 19,
+      "commands": 15,
       "id": "round_08",
-      "moves": 18,
+      "moves": 15,
       "punches": 2,
+      "won": true
+    },
+    {
+      "commands": 44,
+      "id": "round_09",
+      "moves": 43,
+      "punches": 3,
+      "won": true
+    },
+    {
+      "commands": 83,
+      "id": "round_10",
+      "moves": 77,
+      "punches": 10,
+      "won": true
+    },
+    {
+      "commands": 117,
+      "id": "round_11",
+      "moves": 110,
+      "punches": 14,
       "won": true
     }
   ],
@@ -119,13 +144,13 @@
   ],
   "windows_release": {
     "path": "builds/windows/KuroBox.exe",
-    "bytes": 104960464,
-    "sha256": "21d164d754b8381ed1206c2d87f3c01d07b5253b4588a646fd1f1dfaa49ecaed",
+    "bytes": 104981136,
+    "sha256": "7eb124c7f00a44b845bd247da7bfb1a60e3ebd4e817f2dea3fff87ace77e4eed",
     "self_check": {
       "editor_preserved": true,
       "engine": "4.6-stable (official)",
       "failures": [],
-      "levels_won": 8
+      "levels_won": 11
     },
     "clean_exit": true
   },
@@ -383,7 +408,434 @@
     "engine": "4.6-stable (official)",
     "failures": [],
     "flow_fixture_count": 8,
-    "published_levels_loaded": 8,
+    "published_levels_loaded": 11,
     "screenshots": false
+  },
+  "level_design": {
+    "checks": 33,
+    "engine": "4.6-stable (official)",
+    "evidence": {
+      "round_05": {
+        "brake_command_indices": [
+          8
+        ],
+        "counterfactual": {
+          "exhausted": true,
+          "limited": false,
+          "states": 34206,
+          "won": false
+        },
+        "moves": 12,
+        "punches": 1,
+        "recorded_commands": "RDLLLDRPURRRD"
+      },
+      "round_07": {
+        "box_support_command_index": 5,
+        "closure_command_index": 1,
+        "counterfactual": {
+          "exhausted": true,
+          "limited": false,
+          "states": 1,
+          "won": false
+        },
+        "moves": 9,
+        "punches": 2,
+        "recorded_commands": "LDDRURPRRP"
+      },
+      "round_08": {
+        "counterfactual": {
+          "exhausted": true,
+          "limited": false,
+          "states": 3597,
+          "won": false
+        },
+        "handoff_command_index": 10,
+        "moves": 15,
+        "punches": 2,
+        "recorded_commands": "PRRPLUULDLDRRRR"
+      }
+    },
+    "failures": [],
+    "state_limit_per_search": 120000
+  },
+  "advanced_levels": {
+    "checks": 60,
+    "failures": [],
+    "levels": [
+      {
+        "actions": 43,
+        "brakes": [
+          "bag_main<wood_brake"
+        ],
+        "cell_pixels_at_816x432": 32.0,
+        "checkpoints": {
+          "bag_holds_both_gates": {
+            "input": 17,
+            "objects": {
+              "bag_main": [
+                8,
+                3
+              ],
+              "wood_brake": [
+                6,
+                6
+              ]
+            },
+            "player": [
+              5,
+              6
+            ]
+          },
+          "brake_ready": {
+            "input": 26,
+            "objects": {
+              "bag_main": [
+                8,
+                3
+              ],
+              "wood_brake": [
+                10,
+                3
+              ]
+            },
+            "player": [
+              10,
+              4
+            ]
+          }
+        },
+        "goal_vacated": [
+          "wood_brake"
+        ],
+        "height": 9,
+        "id": "round_09",
+        "inputs": 44,
+        "path": "res://content/levels/09_borrowed_brake.json",
+        "punches": 3,
+        "width": 12
+      },
+      {
+        "actions": 77,
+        "brakes": [
+          "bag_lead<bag_follow",
+          "bag_follow<wood_brake",
+          "bag_follow<bag_lead",
+          "bag_lead<wood_brake"
+        ],
+        "cell_pixels_at_816x432": 32.0,
+        "checkpoints": {
+          "crate_uses_lower_route": {
+            "input": 60,
+            "objects": {
+              "bag_follow": [
+                9,
+                6
+              ],
+              "bag_lead": [
+                10,
+                4
+              ],
+              "wood_brake": [
+                7,
+                7
+              ]
+            },
+            "player": [
+              6,
+              7
+            ]
+          },
+          "lower_power_ready": {
+            "input": 43,
+            "objects": {
+              "bag_follow": [
+                9,
+                6
+              ],
+              "bag_lead": [
+                10,
+                4
+              ],
+              "wood_brake": [
+                4,
+                3
+              ]
+            },
+            "player": [
+              9,
+              3
+            ]
+          }
+        },
+        "goal_vacated": [
+          "wood_brake"
+        ],
+        "height": 10,
+        "id": "round_10",
+        "inputs": 83,
+        "path": "res://content/levels/10_cross_circuit.json",
+        "punches": 10,
+        "width": 14
+      },
+      {
+        "actions": 110,
+        "brakes": [
+          "bag_lead<bag_follow",
+          "bag_follow<wood_west",
+          "bag_follow<bag_lead",
+          "bag_follow<wood_east",
+          "bag_lead<wood_west"
+        ],
+        "cell_pixels_at_816x432": 32.0,
+        "checkpoints": {
+          "brake_recovered_through_gate": {
+            "input": 105,
+            "objects": {
+              "bag_follow": [
+                9,
+                7
+              ],
+              "bag_lead": [
+                4,
+                3
+              ],
+              "wood_east": [
+                10,
+                8
+              ],
+              "wood_west": [
+                4,
+                2
+              ]
+            },
+            "player": [
+              9,
+              8
+            ]
+          },
+          "lower_bag_opens_service_bay": {
+            "input": 66,
+            "objects": {
+              "bag_follow": [
+                9,
+                7
+              ],
+              "bag_lead": [
+                10,
+                4
+              ],
+              "wood_east": [
+                9,
+                8
+              ],
+              "wood_west": [
+                4,
+                3
+              ]
+            },
+            "player": [
+              9,
+              5
+            ]
+          },
+          "service_bay_still_locked": {
+            "input": 63,
+            "objects": {
+              "bag_follow": [
+                9,
+                6
+              ],
+              "bag_lead": [
+                10,
+                4
+              ],
+              "wood_east": [
+                9,
+                8
+              ],
+              "wood_west": [
+                4,
+                3
+              ]
+            },
+            "player": [
+              9,
+              3
+            ]
+          }
+        },
+        "goal_vacated": [
+          "bag_lead",
+          "wood_east"
+        ],
+        "height": 11,
+        "id": "round_11",
+        "inputs": 117,
+        "path": "res://content/levels/11_second_shift.json",
+        "punches": 14,
+        "width": 16
+      }
+    ]
+  },
+  "rapid_input": {
+    "baseline_evidence": "evidence/rapid_input_before.json",
+    "capacity": 4,
+    "cases": [
+      {
+        "actual_moves": 3,
+        "case": "three_rapid_taps",
+        "expected_moves": 3,
+        "player": "(4, 2)"
+      }
+    ],
+    "checks": 39,
+    "engine": "4.6-stable (official)",
+    "failures": [],
+    "profile_isolated": true,
+    "repeat_waiting_limit": 1
+  },
+  "campaign_playthrough": {
+    "checks": 426,
+    "display_driver": "Windows",
+    "engine": "4.6-stable (official)",
+    "failures": [],
+    "input_source": "Input.parse_input_event through the actual main scene",
+    "isolated_profile": true,
+    "published_campaign": [
+      {
+        "commands": 2,
+        "id": "round_01",
+        "moves": 2,
+        "punches": 0,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 6,
+        "id": "round_02",
+        "moves": 6,
+        "punches": 0,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 1,
+        "id": "round_03",
+        "moves": 1,
+        "punches": 1,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 4,
+        "id": "round_04",
+        "moves": 3,
+        "punches": 1,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 13,
+        "id": "round_05",
+        "moves": 12,
+        "punches": 1,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 5,
+        "id": "round_06",
+        "moves": 4,
+        "punches": 1,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 10,
+        "id": "round_07",
+        "moves": 9,
+        "punches": 2,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 15,
+        "id": "round_08",
+        "moves": 15,
+        "punches": 2,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 44,
+        "id": "round_09",
+        "moves": 43,
+        "punches": 3,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 83,
+        "id": "round_10",
+        "moves": 77,
+        "punches": 10,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      },
+      {
+        "commands": 117,
+        "id": "round_11",
+        "moves": 110,
+        "punches": 14,
+        "viewport": [
+          1280,
+          720
+        ],
+        "won": true
+      }
+    ],
+    "screenshots": [
+      "res://evidence/campaign_level_select.webp",
+      "res://evidence/campaign_05_start.webp",
+      "res://evidence/campaign_05_mobile_brake.webp",
+      "res://evidence/campaign_07_start.webp",
+      "res://evidence/campaign_07_released_gate.webp",
+      "res://evidence/campaign_08_start.webp",
+      "res://evidence/campaign_08_handoff.webp",
+      "res://evidence/campaign_09_start.webp",
+      "res://evidence/campaign_10_start.webp",
+      "res://evidence/campaign_11_start.webp",
+      "res://evidence/campaign_final_960.webp"
+    ]
   }
 }

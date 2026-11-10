@@ -1,0 +1,17 @@
+{
+  "baseline_evidence": "evidence/rapid_input_before.json",
+  "capacity": 4,
+  "cases": [
+    {
+      "actual_moves": 3,
+      "case": "three_rapid_taps",
+      "expected_moves": 3,
+      "player": "(4, 2)"
+    }
+  ],
+  "checks": 39,
+  "engine": "4.6-stable (official)",
+  "failures": [],
+  "profile_isolated": true,
+  "repeat_waiting_limit": 1
+}

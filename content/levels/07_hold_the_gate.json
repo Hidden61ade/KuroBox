@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "round_07",
   "title": "HOLD THE GATE",
-  "width": 10,
+  "width": 9,
   "height": 7,
   "floor": [
     [
@@ -34,10 +34,6 @@
       1
     ],
     [
-      8,
-      1
-    ],
-    [
       1,
       2
     ],
@@ -63,10 +59,6 @@
     ],
     [
       7,
-      2
-    ],
-    [
-      8,
       2
     ],
     [
@@ -98,10 +90,6 @@
       3
     ],
     [
-      8,
-      3
-    ],
-    [
       1,
       4
     ],
@@ -130,10 +118,6 @@
       4
     ],
     [
-      8,
-      4
-    ],
-    [
       1,
       5
     ],
@@ -159,39 +143,35 @@
     ],
     [
       7,
-      5
-    ],
-    [
-      8,
       5
     ]
   ],
   "walls": [
     [
-      5,
+      4,
       1
     ],
     [
-      5,
+      4,
       2
     ],
     [
-      5,
+      4,
       4
     ],
     [
-      5,
+      4,
       5
     ]
   ],
   "goals": [
     [
-      8,
+      7,
       3
     ]
   ],
   "player": [
-    3,
+    2,
     2
   ],
   "facing": [
@@ -203,7 +183,7 @@
       "id": "wood_01",
       "type": "wood",
       "cell": [
-        3,
+        2,
         3
       ],
       "targets": []
@@ -212,7 +192,7 @@
       "id": "bag_01",
       "type": "bag",
       "cell": [
-        4,
+        3,
         3
       ],
       "targets": []
@@ -221,8 +201,8 @@
       "id": "plate_left",
       "type": "plate",
       "cell": [
-        3,
-        4
+        2,
+        2
       ],
       "targets": [
         "gate_mid"
@@ -232,7 +212,7 @@
       "id": "gate_mid",
       "type": "door",
       "cell": [
-        5,
+        4,
         3
       ],
       "targets": []
@@ -243,7 +223,11 @@
     "hint": "",
     "concept": "Keep a gate open with a box while a bag crosses.",
     "solution": [
+      "L",
       "D",
+      "D",
+      "R",
+      "U",
       "R",
       "P",
       "R",

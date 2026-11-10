@@ -25,7 +25,7 @@ func run(host: EditorPlugin) -> void:
 		_finish()
 		return
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true)
-	get_tree().create_timer(60.0).timeout.connect(_timeout)
+	get_tree().create_timer(90.0).timeout.connect(_timeout)
 	await _frames(12)
 	EditorInterface.set_main_screen_editor("KuroBox")
 	await _frames(4)
@@ -33,6 +33,8 @@ func run(host: EditorPlugin) -> void:
 	_check(panel.get_parent() == EditorInterface.get_editor_main_screen(), "workbench belongs to the editor main screen")
 	_check(panel.entries.size() >= 8, "published sample library loaded")
 	_check(plugin.get_undo_redo() is EditorUndoRedoManager, "native editor history is available")
+	var initial_manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://content/levels/campaign.json"))
+	var initial_published_count: int = initial_manifest.levels.size()
 	panel._dialog_mode = "duplicate"
 	panel.open_level("round_03")
 	panel._new_id.text = "workshop_punch_3"
@@ -128,7 +130,7 @@ func run(host: EditorPlugin) -> void:
 	panel.editor.resume_after_test()
 	_check(panel.publish_current(), "real publish callback validates and registers the level")
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://content/levels/campaign.json"))
-	_check(manifest.levels.size() == 9, "publishing adds the new level to the actual manifest")
+	_check(manifest.levels.size() == initial_published_count + 1, "publishing adds the new level to the actual manifest")
 	var original_order: Array[String] = panel._pending_order.duplicate()
 	panel._move_order(-1)
 	_check(bool(panel.get("_order_dirty")) and panel._pending_order != original_order, "library order edits remain staged before save")
@@ -144,12 +146,12 @@ func run(host: EditorPlugin) -> void:
 	panel.unpublish_current()
 	_check(str(panel.active_document.data.title).contains("保留草稿"), "withdrawal preserves pending in-memory authoring changes")
 	manifest = JSON.parse_string(FileAccess.get_file_as_string("res://content/levels/campaign.json"))
-	_check(manifest.levels.size() == 8, "withdrawal removes only the test publication")
+	_check(manifest.levels.size() == initial_published_count, "withdrawal removes only the test publication")
 	_check(not str(panel._entry("workshop_punch_3").draft_path).is_empty(), "withdrawal keeps an editable draft")
 	_check(Proof.verify(panel.active_document.data, panel.last_proof).valid, "display-title changes do not invalidate a rule proof")
 	panel.open_level("round_08")
 	panel._replay()
-	await get_tree().create_timer(3.6).timeout
+	await get_tree().create_timer(panel.active_document.data.metadata.solution.size() * 0.16 + 0.6).timeout
 	_check(panel.editor.get("_standalone_state").is_won(), "native editor replays the complex published sample")
 	_check(panel._debug.text.contains("gate_mid") and panel._debug.text.contains("供电"), "mechanism debug displays real gate causality")
 	await _shot("native_editor_mechanisms")

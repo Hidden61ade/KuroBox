@@ -1,0 +1,7 @@
+{
+  "actual_moves": 1,
+  "engine": "4.6-stable (official)",
+  "expected_moves": 3,
+  "input": "three discrete RIGHT taps at 20ms intervals",
+  "player": "(2, 2)"
+}

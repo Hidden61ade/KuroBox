@@ -36,14 +36,21 @@ def result_from_log(name):
 def main():
     summary_path = EVIDENCE / "validation_summary.json"
     summary = json.loads(summary_path.read_text(encoding="utf-8-sig")) if summary_path.exists() else {}
-    jobs = ("core", "parameters", "replay", "workspace", "editor", "editor_workbench", "recovery", "profile", "assets", "transition", "flow", "hud_footer")
+    jobs = ("core", "parameters", "replay", "workspace", "editor", "editor_workbench", "recovery", "profile", "assets", "transition", "flow", "hud_footer", "level_design", "advanced_levels", "rapid_input")
     results = {name: result_from_log(name) for name in jobs}
     counts = {name: result["checks"] for name, result in results.items()}
+    for name in ("level_design", "advanced_levels", "rapid_input"):
+        summary[name] = results[name]
     native_path = EVIDENCE / "native_editor_validation.log"
     if native_path.exists():
         native = result_from_log("native_editor")
         counts["native_editor"] = native["checks"]
         summary["native_editor"] = native
+    campaign_path = EVIDENCE / "campaign_playthrough_validation.log"
+    if campaign_path.exists():
+        campaign = result_from_log("campaign_playthrough")
+        counts["campaign_playthrough"] = campaign["checks"]
+        summary["campaign_playthrough"] = campaign
     summary.update(date=date.today().isoformat(), automated_checks=counts, total_checks=sum(counts.values()), failures=[], campaign=results["core"]["campaign"], ui_flow=results["flow"])
     release_path = ROOT / "builds/windows/KuroBox.exe"
     if release_path.exists() and (EVIDENCE / "release_validation.log").exists():

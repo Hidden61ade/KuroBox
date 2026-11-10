@@ -20,7 +20,7 @@ Solutions use commands U,D,L,R (step), P (punch). Runtime references use stable 
 
 ## Scope
 
-8 authored campaign levels initially; the runtime reads the published manifest without a fixed count or order. Start/select/play/pause/settings/completion, infinite undo/restart, persistent progress. Editor supports irregular floor painting, object palette generated from definitions, brush/erase/rectangle/fill/select-copy-move, width/height, birth/facing, plate-door links, undo/redo, clear validation, JSON import/export, immediate test with document preserved. Art and sound are replaceable presentation mappings. Repository excludes runtime/cache data.
+11 authored campaign levels (8 introductory and 3 advanced); the runtime reads the published manifest without a fixed count or order. Start/select/play/pause/settings/completion, infinite undo/restart, persistent progress. Editor supports irregular floor painting, object palette generated from definitions, brush/erase/rectangle/fill/select-copy-move, width/height, birth/facing, plate-door links, undo/redo, clear validation, JSON import/export, immediate test with document preserved. Art and sound are replaceable presentation mappings. Repository excludes runtime/cache data.
 
 ## Native authoring extension
 
