@@ -1,0 +1,135 @@
+{
+  "facing": [
+    1,
+    0
+  ],
+  "floor": [
+    [
+      2,
+      1
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      4,
+      2
+    ],
+    [
+      5,
+      2
+    ],
+    [
+      6,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      3
+    ],
+    [
+      5,
+      3
+    ],
+    [
+      6,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      5,
+      4
+    ]
+  ],
+  "goals": [
+    [
+      6,
+      2
+    ]
+  ],
+  "height": 6,
+  "id": "workshop_punch_3",
+  "metadata": {
+    "chapter": 1.0,
+    "concept": "Instance override: three-cell punch, with the original bag default remaining two.",
+    "hint": "",
+    "solution": [
+      "P"
+    ]
+  },
+  "objects": [
+    {
+      "cell": [
+        3,
+        2
+      ],
+      "id": "item_7f7b2ef04db51d6265971076",
+      "params": {
+        "punch_distance": 3
+      },
+      "targets": [],
+      "type": "bag"
+    }
+  ],
+  "player": [
+    2,
+    2
+  ],
+  "schema_version": 1,
+  "title": "三格沙袋 · 制作示例",
+  "walls": [
+    [
+      4,
+      1
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "width": 8
+}

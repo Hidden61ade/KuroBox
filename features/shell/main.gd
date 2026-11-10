@@ -150,7 +150,6 @@ func show_menu() -> void:
 	corner.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	corner.position = Vector2(24, -72)
 	_content.add_child(corner)
-	corner.add_child(_icon("info", "制作与来源", show_credits, 40))
 	corner.add_child(_icon("settings", "设置", show_settings, 40))
 
 func _icon(key: String, hint: String, callback: Callable, extent: int = 64, navigate: bool = false) -> Button:
@@ -539,15 +538,6 @@ func _apply_settings() -> void:
 		audio.set_muted(bool(profile.settings.muted))
 	_sync_hud_options()
 
-func show_credits() -> void:
-	var column := _modal_column(620)
-	column.add_child(Kit.label("KUROBOX", 36, Kit.ACCENT))
-	var body := Kit.label("Godot 4.6 · 拳击推箱解谜\n\n玩法、规则与编辑器：本项目制作。\nCircuit Delay：界面与素材参考，作者 lhthhh。\nUI Soundpack：Nathan Gibson / CC BY 4.0。\n其他素材及具体路径见 CREDITS.md。", 18)
-	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body.custom_minimum_size.x = 540
-	column.add_child(body)
-	column.add_child(_button("返回", _close_modal))
-
 func show_message(title: String, message: String) -> void:
 	var column := _modal_column(570)
 	column.add_child(Kit.label(title, 28, Kit.ACCENT))
@@ -653,7 +643,7 @@ func _release_self_check() -> void:
 			won_count += 1
 		else:
 			failures.append(str(level.id))
-	if campaign.size() != 8:
+	if campaign.is_empty():
 		failures.append("campaign manifest or JSON export filter")
 	open_editor()
 	var original: Dictionary = editor.get_level()

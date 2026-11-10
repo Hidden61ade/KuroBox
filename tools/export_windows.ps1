@@ -21,5 +21,7 @@ $releaseLog = Join-Path $projectRoot 'evidence\release_validation.log'
 $nativeRun = Start-Process -FilePath $destination -ArgumentList @('--headless','--log-file',('"' + $releaseLog + '"'),'--','--self-check') -WindowStyle Hidden -Wait -PassThru
 if ($nativeRun.ExitCode -ne 0 -or -not (Select-String -LiteralPath $releaseLog -Pattern 'RELEASE_SELF_CHECK .*"failures":\[\]' -Quiet)) { throw 'Exported runtime self-check failed.' }
 if (Select-String -LiteralPath $releaseLog -Pattern 'SCRIPT ERROR:|^ERROR:|ObjectDB instances leaked' -Quiet) { throw "Exported runtime reported an error. See $releaseLog" }
-Copy-Item -LiteralPath (Join-Path $projectRoot 'README.md'), (Join-Path $projectRoot 'CREDITS.md') -Destination $buildRoot -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'README.md') -Destination $buildRoot -Force
+& python (Join-Path $PSScriptRoot 'summarize_validation.py')
+if ($LASTEXITCODE -ne 0) { throw 'Validation summary collection failed.' }
 Write-Output "Exported and verified $destination"

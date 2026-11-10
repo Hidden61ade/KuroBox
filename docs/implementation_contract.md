@@ -20,4 +20,10 @@ Solutions use commands U,D,L,R (step), P (punch). Runtime references use stable 
 
 ## Scope
 
-8 authored campaign levels, start/select/play/pause/settings/completion, infinite undo/restart, persistent progress. Editor supports irregular floor painting, object palette generated from definitions, brush/erase/rectangle/fill/select-copy-move, width/height, birth/facing, plate-door links, undo/redo, clear validation, JSON import/export, immediate test with document preserved. Save validation is structural, not a solvability proof. Art and sound are replaceable presentation mappings. Repository excludes runtime/cache data.
+8 authored campaign levels initially; the runtime reads the published manifest without a fixed count or order. Start/select/play/pause/settings/completion, infinite undo/restart, persistent progress. Editor supports irregular floor painting, object palette generated from definitions, brush/erase/rectangle/fill/select-copy-move, width/height, birth/facing, plate-door links, undo/redo, clear validation, JSON import/export, immediate test with document preserved. Art and sound are replaceable presentation mappings. Repository excludes runtime/cache data.
+
+## Native authoring extension
+
+`addons/kurobox_editor/` provides a Godot Editor main-screen plugin, stable document/instance resources, native Inspector properties and EditorUndoRedoManager transactions. `features/editor/services/level_workspace.gd` owns library and persistence without EditorInterface; `core/replay_proof.gd` verifies actual simulation commands before publication. Drafts and proofs live under `content/workshop/` and are excluded from game exports. See `native_editor_upgrade_contract.md` for the APIs and `native_workbench.md` for the workflow.
+
+The optional instance `params` dictionary stores only overrides. The catalog defines field schemas and defaults. Supported parameters are bag `punch_distance`, plate `activation_filter`, and door `gate_logic`; the default behavior remains two-cell punches, all occupants activating plates, and any linked plate powering a door. Undo restores missing overrides as missing. Draft validation permits incomplete content; strict validation and a current successful replay are separate publication gates.

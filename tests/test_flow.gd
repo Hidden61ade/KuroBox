@@ -1,9 +1,13 @@
 extends SceneTree
 ## Integration proof exercises actual scene instances, signals and input dispatch.
+## Published-content loading is checked first. Subsequent UI flow uses isolated
+## fixtures; its captures are never evidence for the authored campaign content.
+const FLOW_FIXTURE_COUNT := 8
 var failures: Array[String] = []
 var checks: int = 0
 var app: Control
 var capture: bool = false
+var published_level_count: int = 0
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -23,7 +27,16 @@ func _run() -> void:
 	app.profile = ProfileStore.new("user://flow_test_profile.json")
 	app._apply_settings()
 	await process_frame
-	_check(app.campaign.size() == 8, "eight campaign levels loaded by shell")
+	var published_manifest: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://content/levels/campaign.json"))
+	var manifest_valid := published_manifest is Dictionary and published_manifest.get("levels") is Array
+	_check(manifest_valid, "actual published manifest has a level list")
+	if manifest_valid:
+		published_level_count = published_manifest["levels"].size()
+		_check(app.campaign.size() == published_level_count, "shell loads every actual published level regardless of count or order")
+	# Two RIGHT inputs are a contract of this fixture, not of a user's first
+	# published level. Never rewrite content or depend on campaign sort order.
+	app.campaign = _flow_campaign()
+	app.show_menu()
 	_check(app.current_screen == "menu", "initial menu")
 	await _shot("menu")
 	var start_button := app.find_child("StartButton", true, false) as BaseButton
@@ -64,9 +77,10 @@ func _run() -> void:
 	app.show_level_select()
 	await process_frame
 	await process_frame
-	_check(app.find_child("Round08", true, false) != null, "all level buttons available")
+	_check(app.find_child("Round%02d" % app.campaign.size(), true, false) != null, "all isolated fixture level buttons are available")
 	await _shot("select")
-	app.start_level(app.campaign[4], 4)
+	var preview_index := mini(4, app.campaign.size() - 1)
+	app.start_level(app.campaign[preview_index], preview_index)
 	await process_frame
 	await _shot("play")
 	app.show_menu()
@@ -113,7 +127,7 @@ func _run() -> void:
 		var test_path := ProjectSettings.globalize_path("user://flow_test_profile.json" + suffix)
 		if FileAccess.file_exists(test_path):
 			DirAccess.remove_absolute(test_path)
-	var report := {"engine": Engine.get_version_info().string, "checks": checks, "failures": failures, "screenshots": capture}
+	var report := {"engine": Engine.get_version_info().string, "checks": checks, "failures": failures, "screenshots": capture, "published_levels_loaded": published_level_count, "flow_fixture_count": app.campaign.size(), "content_source": "isolated_flow_fixtures", "capture_scope": "UI flow and responsive layout using test fixtures; not authored campaign content"}
 	var file := FileAccess.open("res://evidence/flow_report.json", FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "\t"))
 	file.close()
@@ -143,4 +157,15 @@ func _shot(name: String) -> void:
 	await process_frame
 	await RenderingServer.frame_post_draw
 	var screenshot := root.get_texture().get_image()
-	screenshot.save_webp("res://evidence/" + name + ".webp", false, 0.9)
+	screenshot.save_webp("res://evidence/flow_fixture_" + name + ".webp", false, 0.9)
+
+
+func _flow_campaign() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var floor_cells: Array = []
+	for y: int in range(1, 5):
+		for x: int in range(1, 6):
+			floor_cells.append([x, y])
+	for index: int in range(FLOW_FIXTURE_COUNT):
+		result.append({"schema_version": 1, "id": "round_01" if index == 0 else "flow_fixture_%02d" % (index + 1), "title": "FLOW FIXTURE %02d" % (index + 1), "width": 7, "height": 6, "floor": floor_cells.duplicate(true), "walls": [], "goals": [[5, 2]], "player": [2, 2], "facing": [1, 0], "objects": [{"id": "fixture_wood", "type": "wood", "cell": [3, 2], "targets": []}], "metadata": {"solution": ["R", "R"], "source": "isolated_flow_fixture"}})
+	return result

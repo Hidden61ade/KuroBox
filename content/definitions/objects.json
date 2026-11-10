@@ -32,7 +32,8 @@
       "color": "#dfbd70",
       "pushable": false,
       "punchable": false,
-      "punch_distance": 0
+      "punch_distance": 0,
+      "activation_filter": "all"
     },
     {
       "id": "door",
@@ -44,7 +45,19 @@
       "color": "#87b6a3",
       "pushable": false,
       "punchable": false,
-      "punch_distance": 0
+      "punch_distance": 0,
+      "gate_logic": "any"
+    },
+    {
+      "behavior": "bag",
+      "color": "#df746b",
+      "editor_label": "三格沙袋",
+      "id": "bag_3",
+      "label": "三格沙袋",
+      "punch_distance": 3,
+      "punchable": true,
+      "pushable": false,
+      "sprite": "res://assets/sprites/boxing_bag.png"
     }
   ]
 }

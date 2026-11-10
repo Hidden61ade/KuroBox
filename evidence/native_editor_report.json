@@ -1,0 +1,13 @@
+{
+	"checks": 46,
+	"engine": "4.6-stable (official)",
+	"failures": [],
+	"native_editor": true,
+	"screenshots": [
+		"res://evidence/native_editor_parameters.png",
+		"res://evidence/native_editor_published.png",
+		"res://evidence/native_editor_mechanisms.png",
+		"res://evidence/native_editor_library.png"
+	],
+	"workspace": "isolated copy of the project"
+}

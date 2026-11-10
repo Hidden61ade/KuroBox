@@ -19,7 +19,7 @@
 
 ## Circuit Delay
 
-来源：[Circuit Delay / lhthhh](https://lht-hhh.itch.io/circuit-delay)。输入为网页加载的 `index.pck`，SHA-256 为 `84eff76d9e42a25a0719d4d3f4d1e24e5ffe62fe925dd6367df488141fe90862`。REA 提取记录为 `ev_ce145a9179203e28eb29c282861e836688b445acf1eb263bb30d338ace4b06e8`。资源通过 Godot 4.6 转成可读文件，没有恢复或沿用原项目代码架构。
+输入为网页加载的 `index.pck`，SHA-256 为 `84eff76d9e42a25a0719d4d3f4d1e24e5ffe62fe925dd6367df488141fe90862`。REA 提取记录为 `ev_ce145a9179203e28eb29c282861e836688b445acf1eb263bb30d338ace4b06e8`。资源通过 Godot 4.6 转成可读文件，没有恢复或沿用原项目代码架构。
 
 - `assets/ui/circuit_Button_small2.png` 到 `small11.png`：16×16 小按钮，另有 quit、music、screen 及 `icon_*` 别名。
 - `circuit_start_normal/hover/pressed.png`：原 `start_button1/2/3` 三态，26×20。
@@ -29,19 +29,15 @@
 - `assets/sprites/ref_goal.png`、`ref_wall.png`、`ref_plate.png`、`ref_door.png`：原 Socket、灰凸台、八角底座和 X 阻挡；`ref_door_open.png` 为同一阻挡图透明度乘 0.22 的打开状态。
 - `circuit_awesome9.ttf`：原包中的 Awesome 9 / Regular 字体数据，已由 Godot 4.6 读取并确认名称。
 
-`assets/source/reference_mapping.json` 只保留 UI、环境及 Effect 裁切记录，不再把备选兔子、树桩或木盾列为游戏主体。Circuit 文件属于第三方素材，不宣称自制，也不据公开发布包推断商业发行授权；字体原始作者与单独许可尚未确认。
 
 ## 用户提供的素材包
 
 `Effect.zip` 中的 `Effect/sheets/32x32.png` 保存为 `assets/effects/supplied_effects_32.png`，图集为 192×352。`ref_punch_arc_0~5.png` 裁自第 7 行，每帧 32×32。第 5 帧源格透明，可作结束帧；实际播放可使用 0–4 帧后清除。
 
-`ASSET_v0.2.zip` 中的 `ASSET/sheet/items.png` 保存为 `assets/ui/supplied_items.png`，供工具等图标使用。两个包均未附作者及许可文本，按用户提供的文件记录来源。
 
-Sprout Lands UI Basic Pack 的作者为 Cup Nooble，原始文件保存在 `assets/ui/sprout/`。当前使用其中的 UI 图标、按钮与字体，Teemo 兔子不作为当前角色。暂停图标由现成音量条竖线裁切组合。随包 Free Basic Pack 许可允许修改，仅用于非商业项目，并禁止重新分发或转售素材（包括修改版本）；原文保存在 `read_me.txt`，不推断额外授权。
 
 ## 声音
 
-菜单与编辑器音效来自 Nathan Gibson 的 Universal UI Soundpack，许可为 CC BY 4.0。署名：[Nathan Gibson](https://nathangibson.myportfolio.com)。原文保存在 `assets/audio/UI_Soundpack_LICENSE.txt`。
 
 - `ui_confirm.ogg`：Minimalist1；`ui_back.ogg`：Minimalist2。
 - `place.ogg`：Wood Block1；`undo.ogg`：Minimalist5；`goal.ogg`：Retro12。

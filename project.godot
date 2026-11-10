@@ -32,3 +32,7 @@ common/physics_ticks_per_second=60
 
 [debug]
 gdscript/warnings/untyped_declaration=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/kurobox_editor/plugin.cfg")

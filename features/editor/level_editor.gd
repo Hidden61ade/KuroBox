@@ -1,3 +1,4 @@
+@tool
 class_name LevelEditor
 extends Control
 ## The authored document is independent of both the preview and play-test state.
@@ -5,12 +6,21 @@ extends Control
 signal test_requested(level: Dictionary)
 signal exit_requested
 signal sound_requested(event: String)
+signal document_changed(before: Dictionary, after: Dictionary, label: String)
+signal selection_changed(instance_id: String)
+signal proof_recorded(proof: Dictionary)
+signal test_state_changed(debug: Array[Dictionary], summary: Dictionary)
+signal undo_requested
+signal redo_requested
+signal save_requested
 
 const Catalog = preload("res://core/object_catalog.gd")
 const Codec = preload("res://core/level_codec.gd")
 const View = preload("res://features/play/board_view.gd")
 const State = preload("res://core/board_state.gd")
 const Backdrop = preload("res://features/shell/scrolling_backdrop.gd")
+const Proof = preload("res://core/replay_proof.gd")
+const Overlay = preload("res://features/editor/editor_overlay.gd")
 const MIN_SIDE := 4
 const MAX_SIDE := 24
 const HISTORY_LIMIT := 200
@@ -19,6 +29,9 @@ const PAPER := Color("333941")
 const ACCENT := Color("ffd541")
 
 var document: Dictionary = {}
+var embedded_mode: bool = false
+var native_inspector: bool = true
+var use_external_history: bool = false
 var _saved_document: Dictionary = {}
 var _undo: Array[Dictionary] = []
 var _redo: Array[Dictionary] = []
@@ -42,6 +55,15 @@ var _standalone_board: Control
 var _standalone_label: Label
 var _standalone_won := false
 var _local_audio: Node
+var _edit_label := "编辑关卡"
+var _last_proof: Dictionary = {}
+var _test_source: Dictionary = {}
+var _test_commands: Array[String] = []
+var _test_command_history: Array[Dictionary] = []
+var _replaying: bool = false
+var _replay_generation: int = 0
+var _test_debug_label: RichTextLabel
+var _palette_grid: GridContainer
 
 var _board: Control
 var _overlay: Control
@@ -62,46 +84,11 @@ var _file_dialog: FileDialog
 var _confirm_dialog: ConfirmationDialog
 
 
-class EditorOverlay extends Control:
-	var editor: Control
-
-	func _draw() -> void:
-		if editor == null or editor._board == null:
-			return
-		var view: Control = editor._board
-		var selection: Rect2i = editor._selection
-		if editor._drag_start.x >= 0 and editor._tool in ["rect", "select"]:
-			selection = editor._rect_between(editor._drag_start, editor._drag_cell)
-		if selection.has_area():
-			var first: Rect2 = view.cell_to_rect(selection.position)
-			var last: Rect2 = view.cell_to_rect(selection.end - Vector2i.ONE)
-			var box := Rect2(first.position, last.end - first.position)
-			draw_rect(box, Color(1.0, 0.84, 0.25, 0.14), true)
-			draw_rect(box.grow(-1.0), Color("ffd541"), false, 2.0)
-		if editor._focus_cell.x >= 0:
-			draw_rect(view.cell_to_rect(editor._focus_cell).grow(-3.0), Color("fff1b8"), false, 3.0)
-		for object: Dictionary in editor.document.get("objects", []):
-			if str(Catalog.get_type(str(object.get("type", ""))).get("behavior", "")) != "plate":
-				continue
-			var from: Vector2 = view.cell_to_rect(editor._vec(object.get("cell", [-1, -1]))).get_center()
-			for target_id in object.get("targets", []):
-				var target: Dictionary = editor._find_object(str(target_id))
-				if target.is_empty():
-					continue
-				var to: Vector2 = view.cell_to_rect(editor._vec(target.get("cell", [-1, -1]))).get_center()
-				var color := Color(0.89, 0.68, 0.29, 0.65)
-				if str(object.get("id", "")) == editor._selected_id:
-					color = Color("fff1b8")
-				draw_line(from, to, color, 2.0, true)
-				draw_circle(from, 4.0, color)
-				draw_circle(to, 4.0, color)
-
-
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	if theme == null and ResourceLoader.exists("res://features/shell/ui_kit.gd"):
+	if not embedded_mode and not Engine.is_editor_hint() and theme == null and ResourceLoader.exists("res://features/shell/ui_kit.gd"):
 		theme = load("res://features/shell/ui_kit.gd").make_theme()
-	if theme != null:
+	if not embedded_mode and not Engine.is_editor_hint() and theme != null:
 		var compact: Theme = theme.duplicate()
 		compact.default_font_size = 16
 		for type_name in ["Button", "OptionButton", "LineEdit"]:
@@ -130,6 +117,7 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	_replay_generation += 1
 	if is_instance_valid(_local_audio) and _local_audio.has_method("stop_all"):
 		_local_audio.stop_all()
 
@@ -145,8 +133,10 @@ func setup(level: Dictionary = {}) -> void:
 	_selected_id = ""
 	_link_source = ""
 	_path = ""
+	_last_proof = {}
 	if _built:
 		_refresh()
+		_board.fit_view()
 
 
 func get_level() -> Dictionary:
@@ -158,24 +148,156 @@ func is_dirty() -> bool:
 	return JSON.stringify(document) != JSON.stringify(_saved_document)
 
 
+func mark_document_saved() -> void:
+	_finish_edit()
+	_saved_document = document.duplicate(true)
+	_refresh()
+
+
+func begin_link(instance_id: String) -> bool:
+	var object := _find_object(instance_id)
+	if object.is_empty() or Catalog.get_type(str(object.get("type", ""))).get("behavior") != "plate":
+		return false
+	select_instance(instance_id)
+	_link_source = instance_id
+	if _built:
+		_status.text = "点击门以连接 / 断开；Esc 结束连线"
+	return true
+
+
+func apply_document(level: Dictionary) -> void:
+	if _standalone_state != null:
+		resume_after_test()
+	_stroke_before = {}
+	document = Codec.normalize(level.duplicate(true))
+	_invalidate_proof()
+	_refresh()
+	if _selected_id != "" and _find_object(_selected_id).is_empty():
+		_selected_id = ""
+	selection_changed.emit(_selected_id)
+
+
+func apply_instance_parameter(instance_id: String, field: String, value: Variant, record_history: bool = true) -> bool:
+	return _set_instance_parameter(instance_id, field, value, false, record_history)
+
+
+func clear_instance_parameter(instance_id: String, field: String, record_history: bool = true) -> bool:
+	return _set_instance_parameter(instance_id, field, null, true, record_history)
+
+
+func _set_instance_parameter(instance_id: String, field: String, value: Variant, clear: bool, record_history: bool) -> bool:
+	_finish_edit()
+	var object := _find_object(instance_id)
+	if object.is_empty():
+		return false
+	var known := false
+	for descriptor: Dictionary in Catalog.parameter_schema(str(object.get("type", ""))):
+		if str(descriptor.get("id", "")) == field:
+			known = true
+	if not known:
+		return false
+	var candidate := object.duplicate(true)
+	var parameters: Dictionary = candidate.get("params", {}).duplicate(true)
+	var defaults: Dictionary = Catalog.get_type(str(object["type"]))
+	if clear or value == defaults.get(field):
+		parameters.erase(field)
+	else:
+		parameters[field] = value
+	if parameters.is_empty():
+		candidate.erase("params")
+	else:
+		candidate["params"] = parameters
+	if not Catalog.validate_parameters(candidate).is_empty():
+		return false
+	if _standalone_state != null:
+		resume_after_test()
+	_begin_edit("修改参数 " + field)
+	object = _find_object(instance_id)
+	if candidate.has("params"):
+		object["params"] = candidate["params"]
+	else:
+		object.erase("params")
+	if record_history:
+		_finish_edit()
+	else:
+		if document.get("metadata") is Dictionary and Proof.revision(document) != Proof.revision(_stroke_before):
+			document["metadata"]["solution"] = []
+		_stroke_before = {}
+		_invalidate_proof()
+		_refresh()
+	return true
+
+
+func select_instance(instance_id: String) -> void:
+	_selected_id = instance_id if not _find_object(instance_id).is_empty() else ""
+	var object := _find_object(_selected_id)
+	if not object.is_empty():
+		_focus_cell = _vec(object.get("cell", [-1, -1]))
+	_refresh_inspector()
+	selection_changed.emit(_selected_id)
+
+func focus_instance(instance_id: String) -> void:
+	select_instance(instance_id)
+	if not _selected_id.is_empty() and _built:
+		_board.focus_cell(_focus_cell)
+
+
+func get_last_proof() -> Dictionary:
+	_invalidate_proof()
+	return _last_proof.duplicate(true)
+
+
+func set_last_proof(proof: Dictionary) -> bool:
+	var verified: Dictionary = Proof.verify(document, proof)
+	if not verified.get("valid", false):
+		return false
+	_last_proof = proof.duplicate(true)
+	return true
+
+
+func _invalidate_proof() -> void:
+	if not _last_proof.is_empty() and str(_last_proof.get("revision", "")) != Proof.revision(document):
+		_last_proof = {}
+
+
+func refresh_catalog() -> void:
+	var errors: Array[String] = Catalog.reload_catalog()
+	if _built:
+		for child in _palette_grid.get_children():
+			_palette_grid.remove_child(child)
+			child.queue_free()
+		_palette_buttons.clear()
+		_populate_palette()
+		_board.refresh_catalog()
+		_refresh()
+		if not errors.is_empty():
+			_status.text = "\n".join(errors)
+	_invalidate_proof()
+
+
 func resume_after_test() -> void:
+	_replay_generation += 1
+	_replaying = false
 	visible = true
 	if _standalone_layer != null:
 		_standalone_layer.queue_free()
 		_standalone_layer = null
 	_standalone_state = null
 	_standalone_board = null
+	_test_debug_label = null
 	_standalone_won = false
 	# Deliberately do not reload or replace the authored document / selection.
 	if _built:
 		_status.text = ""
 		_board.queue_redraw()
 		_overlay.queue_redraw()
+	var no_debug: Array[Dictionary] = []
+	test_state_changed.emit(no_debug, {"active": false, "commands": _test_commands.duplicate(), "proof_valid": not get_last_proof().is_empty()})
 
 
 func _build_ui() -> void:
-	var background := Backdrop.new()
-	add_child(background)
+	if not embedded_mode:
+		add_child(Backdrop.new())
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for side in ["left", "right", "top", "bottom"]:
@@ -191,18 +313,23 @@ func _build_ui() -> void:
 	_document_label.add_theme_font_size_override("font_size", 22)
 	_document_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(_document_label)
-	_button(top, "新建", func(): _ask_action("new"))
-	_button(top, "导入", func(): _ask_action("import"))
-	_button(top, "导出", _request_export)
+	if not embedded_mode:
+		_button(top, "新建", func(): _ask_action("new"))
+		_button(top, "导入", func(): _ask_action("import"))
+		_button(top, "导出", _request_export)
 	_button(top, "▶ 测试", _request_test)
-	_button(top, "返回", func(): _ask_action("exit"))
+	_button(top, "验证回放", play_verified_replay)
+	_button(top, "适配全图", func(): _board.fit_view())
+	if not embedded_mode:
+		_button(top, "返回", func(): _ask_action("exit"))
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", 12)
 	root.add_child(body)
 	var side_panel := PanelContainer.new()
 	side_panel.custom_minimum_size.x = 238
-	side_panel.add_theme_stylebox_override("panel", _panel_style(PAPER))
+	if not embedded_mode:
+		side_panel.add_theme_stylebox_override("panel", _panel_style(PAPER))
 	body.add_child(side_panel)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -219,6 +346,7 @@ func _build_ui() -> void:
 	_title_edit.text_submitted.connect(func(_text: String): _commit_text())
 	_title_edit.focus_exited.connect(_commit_text)
 	_id_edit = LineEdit.new()
+	_id_edit.editable = not embedded_mode
 	_id_edit.placeholder_text = "稳定 ID，例如 workshop_01"
 	_id_edit.tooltip_text = "存档和关卡引用使用的稳定标识；改标题无需改 ID"
 	side.add_child(_id_edit)
@@ -249,17 +377,14 @@ func _build_ui() -> void:
 	_button(clip_row, "复制选区", copy_selection)
 	_button(clip_row, "粘贴", func(): _select_tool("paste"))
 	_section(side, "图块 / 物件")
-	var palette_grid := GridContainer.new()
-	palette_grid.columns = 2
-	side.add_child(palette_grid)
-	_palette_button(palette_grid, "地板", "floor")
-	_palette_button(palette_grid, "墙", "walls")
-	_palette_button(palette_grid, "目标格", "goals")
-	_palette_button(palette_grid, "出生点", "spawn")
-	for definition: Dictionary in Catalog.all_types():
-		_palette_button(palette_grid, str(definition.get("editor_label", definition.get("label", definition.get("id", "?")))), "object:" + str(definition.get("id", "")))
-	_section(side, "选中 / 属性")
+	_palette_grid = GridContainer.new()
+	_palette_grid.columns = 2
+	side.add_child(_palette_grid)
+	_populate_palette()
+	if not (embedded_mode and native_inspector):
+		_section(side, "选中 / 属性")
 	_inspector = VBoxContainer.new()
+	_inspector.visible = not (embedded_mode and native_inspector)
 	side.add_child(_inspector)
 	var board_column := VBoxContainer.new()
 	board_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -276,12 +401,13 @@ func _build_ui() -> void:
 	board_container.add_child(_board)
 	_board.cell_pressed.connect(_on_cell_pressed)
 	_board.cell_dragged.connect(_on_cell_dragged)
-	_overlay = EditorOverlay.new()
+	_overlay = Overlay.new()
 	_overlay.editor = self
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_board.add_child(_overlay)
 	_board.resized.connect(func(): _overlay.queue_redraw())
+	_board.view_changed.connect(func(): _overlay.queue_redraw())
 	var errors_title := HBoxContainer.new()
 	board_column.add_child(errors_title)
 	_small_label(errors_title, "检查结果")
@@ -311,6 +437,18 @@ func _build_ui() -> void:
 	_confirm_dialog.confirmed.connect(_execute_pending)
 	add_child(_confirm_dialog)
 	_built = true
+	if embedded_mode:
+		for label: Label in find_children("*", "Label", true, false):
+			label.remove_theme_color_override("font_color")
+
+
+func _populate_palette() -> void:
+	_palette_button(_palette_grid, "地板", "floor")
+	_palette_button(_palette_grid, "墙", "walls")
+	_palette_button(_palette_grid, "目标格", "goals")
+	_palette_button(_palette_grid, "出生点", "spawn")
+	for definition: Dictionary in Catalog.all_types():
+		_palette_button(_palette_grid, str(definition.get("editor_label", definition.get("label", definition.get("id", "?")))), "object:" + str(definition.get("id", "")))
 
 
 func _panel_style(color: Color) -> StyleBoxFlat:
@@ -412,8 +550,8 @@ func _refresh() -> void:
 	_refreshing = false
 	_board.set_level_preview(document)
 	_overlay.queue_redraw()
-	_undo_button.disabled = _undo.is_empty()
-	_redo_button.disabled = _redo.is_empty()
+	_undo_button.disabled = _undo.is_empty() and not use_external_history
+	_redo_button.disabled = _redo.is_empty() and not use_external_history
 	_document_label.text = "关卡工坊" + ("  ●" if is_dirty() else "")
 	for entry in _palette_buttons:
 		_palette_buttons[entry].button_pressed = entry == _palette
@@ -423,7 +561,7 @@ func _refresh() -> void:
 func _commit_text() -> void:
 	if _refreshing or document.is_empty():
 		return
-	_begin_edit()
+	_begin_edit("修改关卡信息")
 	document["title"] = _title_edit.text.strip_edges()
 	document["id"] = _id_edit.text.strip_edges()
 	_finish_edit()
@@ -436,7 +574,7 @@ func _resize_changed(_value: float) -> void:
 
 
 func resize_document(width: int, height: int) -> void:
-	_begin_edit()
+	_begin_edit("调整地图尺寸")
 	document["width"] = clampi(width, MIN_SIDE, MAX_SIDE)
 	document["height"] = clampi(height, MIN_SIDE, MAX_SIDE)
 	var removed := 0
@@ -467,22 +605,25 @@ func resize_document(width: int, height: int) -> void:
 		_status.text = "地图尺寸已更新" if removed == 0 else "已裁去 %d 项越界内容 · 可撤销恢复；请重新检查出生点" % removed
 
 
-func _begin_edit() -> void:
+func _begin_edit(label: String = "编辑关卡") -> void:
 	if _stroke_before.is_empty():
 		_stroke_before = document.duplicate(true)
+		_edit_label = label
 
 
 func _finish_edit() -> void:
 	if _stroke_before.is_empty():
 		return
 	if JSON.stringify(document) != JSON.stringify(_stroke_before):
-		# A stored solution only describes the previous authored revision.
-		if document.get("metadata") is Dictionary:
+		if document.get("metadata") is Dictionary and Proof.revision(document) != Proof.revision(_stroke_before):
 			document["metadata"]["solution"] = []
-		_undo.append(_stroke_before)
-		if _undo.size() > HISTORY_LIMIT:
-			_undo.pop_front()
-		_redo.clear()
+		if not use_external_history:
+			_undo.append(_stroke_before)
+			if _undo.size() > HISTORY_LIMIT:
+				_undo.pop_front()
+			_redo.clear()
+		_invalidate_proof()
+		document_changed.emit(_stroke_before.duplicate(true), document.duplicate(true), _edit_label)
 		_play_sound("place")
 	_stroke_before = {}
 	_refresh()
@@ -490,6 +631,9 @@ func _finish_edit() -> void:
 
 func undo_edit() -> void:
 	_finish_edit()
+	if use_external_history:
+		undo_requested.emit()
+		return
 	if _undo.is_empty():
 		return
 	_redo.append(document.duplicate(true))
@@ -500,6 +644,9 @@ func undo_edit() -> void:
 
 func redo_edit() -> void:
 	_finish_edit()
+	if use_external_history:
+		redo_requested.emit()
+		return
 	if _redo.is_empty():
 		return
 	_undo.append(document.duplicate(true))
@@ -551,6 +698,10 @@ func _on_cell_dragged(cell: Vector2i, button: int) -> void:
 func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
+	if (embedded_mode or Engine.is_editor_hint()) and event is InputEventKey:
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused == null or (focused != self and not is_ancestor_of(focused)):
+			return
 	if _standalone_state != null:
 		_handle_standalone_input(event)
 		return
@@ -583,7 +734,13 @@ func _input(event: InputEvent) -> void:
 			KEY_V:
 				_select_tool("paste")
 			KEY_S:
-				_request_export()
+				if embedded_mode:
+					save_requested.emit()
+					get_viewport().set_input_as_handled()
+				else:
+					_request_export()
+		if event.keycode in [KEY_Z, KEY_Y, KEY_C, KEY_V, KEY_S]:
+			get_viewport().set_input_as_handled()
 		return
 	match event.keycode:
 		KEY_B: _select_tool("brush")
@@ -598,8 +755,10 @@ func _input(event: InputEvent) -> void:
 			if _link_source != "":
 				_link_source = ""
 				_refresh_inspector()
-			else:
+			elif not embedded_mode:
 				_ask_action("exit")
+	if event.keycode in [KEY_B, KEY_E, KEY_R, KEY_F, KEY_S, KEY_M, KEY_V, KEY_F5, KEY_ESCAPE]:
+		get_viewport().set_input_as_handled()
 
 
 func _paint_cell(cell: Vector2i, erase: bool) -> void:
@@ -651,7 +810,7 @@ func _set_layer_cell(layer: String, cell: Vector2i, enabled: bool) -> void:
 
 
 func paint_rectangle(area: Rect2i, erase: bool = false) -> void:
-	_begin_edit()
+	_begin_edit("矩形擦除" if erase else "矩形绘制")
 	if _palette == "spawn":
 		_paint_cell(area.position, erase)
 	else:
@@ -691,6 +850,7 @@ func _preview_change() -> void:
 		_board.set_level_preview(document)
 		_overlay.queue_redraw()
 		_refresh_inspector()
+		selection_changed.emit(_selected_id)
 
 
 func copy_selection() -> void:
@@ -731,7 +891,7 @@ func paste_clipboard(destination: Vector2i) -> void:
 		if _built:
 			_status.text = "选区超出地图，未粘贴"
 		return
-	_begin_edit()
+	_begin_edit("粘贴选区")
 	_clear_region(area)
 	_insert_region(_clipboard, destination, true)
 	_selection = area
@@ -749,7 +909,7 @@ func move_selection(destination: Vector2i) -> void:
 			_status.text = "选区超出地图，未移动"
 		return
 	var content := _capture_region(_selection)
-	_begin_edit()
+	_begin_edit("移动选区")
 	# Clear both areas before insertion, which also makes overlapping moves safe.
 	_clear_region(_selection, false)
 	_clear_region(area, false)
@@ -810,10 +970,14 @@ func _select_object_at(cell: Vector2i) -> void:
 		if _vec(object.get("cell", [-1, -1])) == cell:
 			_selected_id = str(object.get("id", ""))
 	_refresh_inspector()
+	selection_changed.emit(_selected_id)
 
 
 func _refresh_inspector() -> void:
 	if not _built:
+		return
+	if embedded_mode and native_inspector:
+		_overlay.queue_redraw()
 		return
 	for child in _inspector.get_children():
 		_inspector.remove_child(child)
@@ -846,6 +1010,8 @@ func _refresh_inspector() -> void:
 		description.text = str(definition.get("editor_label", definition.get("label", selected.get("type", ""))))
 		description.add_theme_color_override("font_color", INK)
 		_inspector.add_child(description)
+		for descriptor: Dictionary in Catalog.parameter_schema(str(selected.get("type", ""))):
+			_add_parameter_control(selected, descriptor)
 		if str(definition.get("behavior", "")) == "plate":
 			var link_button := _button(_inspector, "取消连线" if _link_source == _selected_id else "连线到门", _toggle_link)
 			link_button.tooltip_text = "点击后，点选棋盘上的门来连接或断开；Esc 结束"
@@ -882,8 +1048,39 @@ func _refresh_inspector() -> void:
 	_overlay.queue_redraw()
 
 
+func _add_parameter_control(object: Dictionary, descriptor: Dictionary) -> void:
+	var field := str(descriptor.get("id", ""))
+	var instance_id := str(object.get("id", ""))
+	var effective: Dictionary = Catalog.resolve_instance(object)
+	var row := HBoxContainer.new()
+	_inspector.add_child(row)
+	var label := _small_label(row, str(descriptor.get("label", field)))
+	label.tooltip_text = str(descriptor.get("description", ""))
+	if not embedded_mode:
+		label.add_theme_color_override("font_color", INK)
+	if str(descriptor.get("type", "")) == "int":
+		var spin := SpinBox.new()
+		spin.min_value = float(descriptor.get("min", 0))
+		spin.max_value = float(descriptor.get("max", 16))
+		spin.step = 1
+		spin.value = float(effective.get(field, 0))
+		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(spin)
+		spin.value_changed.connect(func(value: float): apply_instance_parameter(instance_id, field, int(value)))
+	else:
+		var choice := OptionButton.new()
+		var options: Array = descriptor.get("options", [])
+		for option: Variant in options:
+			choice.add_item(str(option))
+		choice.select(maxi(0, options.find(effective.get(field))))
+		row.add_child(choice)
+		choice.item_selected.connect(func(index: int): apply_instance_parameter(instance_id, field, options[index]))
+	var reset := _button(row, "↶", func(): clear_instance_parameter(instance_id, field))
+	reset.tooltip_text = "恢复类型默认值"
+
+
 func _delete_selected() -> void:
-	_begin_edit()
+	_begin_edit("删除物件")
 	var keep: Array = []
 	for object: Dictionary in document.get("objects", []):
 		if str(object.get("id", "")) != _selected_id:
@@ -913,7 +1110,7 @@ func _toggle_target(source_id: String, door_id: String) -> void:
 	var object := _find_object(source_id)
 	if object.is_empty():
 		return
-	_begin_edit()
+	_begin_edit("修改机关连线")
 	var targets: Array = object.get("targets", []).duplicate()
 	if targets.has(door_id):
 		targets.erase(door_id)
@@ -967,6 +1164,8 @@ func _error_cell(message: String) -> Vector2i:
 func _focus_error(index: int) -> void:
 	if index >= 0 and index < _error_cells.size():
 		_focus_cell = _error_cells[index]
+		if _focus_cell.x >= 0:
+			_board.focus_cell(_focus_cell)
 		_select_object_at(_focus_cell)
 		_overlay.queue_redraw()
 
@@ -1057,14 +1256,26 @@ func _execute_pending() -> void:
 
 
 func _request_test() -> void:
+	if embedded_mode or test_requested.get_connections().is_empty():
+		begin_test()
+		return
 	_commit_text()
 	if not validate_document().is_empty():
 		return
 	var level := get_level()
-	if test_requested.get_connections().is_empty():
-		_start_standalone_test(level)
-	else:
-		test_requested.emit(level)
+	test_requested.emit(level)
+
+
+func begin_test() -> void:
+	_commit_text()
+	if not validate_document().is_empty():
+		return
+	if _standalone_state != null:
+		resume_after_test()
+	_test_source = get_level()
+	_test_commands.clear()
+	_test_command_history.clear()
+	_start_standalone_test(_test_source)
 
 
 func _start_standalone_test(level: Dictionary) -> void:
@@ -1073,9 +1284,19 @@ func _start_standalone_test(level: Dictionary) -> void:
 	_standalone_won = false
 	_standalone_layer = PanelContainer.new()
 	_standalone_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_standalone_layer.add_theme_stylebox_override("panel", _panel_style(Color.TRANSPARENT))
+	if embedded_mode:
+		# Editor themes may use an empty/transparent PanelContainer style.
+		# The test viewport must cover the authoring canvas beneath it.
+		var test_background := get_theme_color("base_color", "Editor") if has_theme_color("base_color", "Editor") else Color("292f34")
+		test_background.a = 1.0
+		var test_panel := StyleBoxFlat.new()
+		test_panel.bg_color = test_background
+		_standalone_layer.add_theme_stylebox_override("panel", test_panel)
+	else:
+		_standalone_layer.add_theme_stylebox_override("panel", _panel_style(Color.TRANSPARENT))
 	add_child(_standalone_layer)
-	_standalone_layer.add_child(Backdrop.new())
+	if not embedded_mode:
+		_standalone_layer.add_child(Backdrop.new())
 	var column := VBoxContainer.new()
 	_standalone_layer.add_child(column)
 	var top := HBoxContainer.new()
@@ -1086,46 +1307,77 @@ func _start_standalone_test(level: Dictionary) -> void:
 	_standalone_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(_standalone_label)
 	_button(top, "返回编辑  Esc", resume_after_test)
+	_button(top, "撤销  Z", func(): _execute_test_command("UNDO"))
+	_button(top, "重开  R", func(): _execute_test_command("RESTART"))
 	_standalone_board = View.new()
 	_standalone_board.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_standalone_board.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(_standalone_board)
 	_standalone_board.set_board(_standalone_state)
+	_test_debug_label = RichTextLabel.new()
+	_test_debug_label.custom_minimum_size.y = 96
+	_test_debug_label.scroll_active = true
+	column.add_child(_test_debug_label)
+	_standalone_board.grab_focus()
+	_publish_test_state()
 
 
 func _handle_standalone_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	var before: Dictionary = _standalone_state.snapshot()
-	var result: Dictionary = {}
-	match event.keycode:
-		KEY_ESCAPE:
-			resume_after_test()
-			get_viewport().set_input_as_handled()
-			return
+	var key: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+	if key == KEY_ESCAPE:
+		resume_after_test()
+		get_viewport().set_input_as_handled()
+		return
+	if _replaying:
+		return
+	var command := ""
+	match key:
 		KEY_Z, KEY_BACKSPACE:
-			_standalone_state.undo()
-			_standalone_won = false
+			command = "UNDO"
 		KEY_R:
-			_standalone_state.restart()
-			_standalone_won = false
+			command = "RESTART"
 		KEY_SPACE:
-			if not _standalone_won:
-				result = _standalone_state.punch()
+			command = "P"
 		KEY_LEFT, KEY_A:
-			if not _standalone_won:
-				result = _standalone_state.step(Vector2i.LEFT)
+			command = "L"
 		KEY_RIGHT, KEY_D:
-			if not _standalone_won:
-				result = _standalone_state.step(Vector2i.RIGHT)
+			command = "R"
 		KEY_UP, KEY_W:
-			if not _standalone_won:
-				result = _standalone_state.step(Vector2i.UP)
+			command = "U"
 		KEY_DOWN, KEY_S:
-			if not _standalone_won:
-				result = _standalone_state.step(Vector2i.DOWN)
+			command = "D"
 		_:
 			return
+	_execute_test_command(command)
+	get_viewport().set_input_as_handled()
+
+
+func _execute_test_command(command: String) -> void:
+	if _standalone_state == null:
+		return
+	var before: Dictionary = _standalone_state.snapshot()
+	var result: Dictionary = {}
+	if command == "UNDO":
+		if _standalone_state.undo() and not _test_command_history.is_empty():
+			var previous: Dictionary = _test_command_history.pop_back()
+			_test_commands.assign(previous["commands"])
+	elif command == "RESTART":
+		_standalone_state.restart()
+		_test_commands.clear()
+		_test_command_history.clear()
+	elif not _standalone_won:
+		var directions := {"U": Vector2i.UP, "D": Vector2i.DOWN, "L": Vector2i.LEFT, "R": Vector2i.RIGHT}
+		if command == "P":
+			result = _standalone_state.punch()
+		elif directions.has(command):
+			result = _standalone_state.step(directions[command])
+		else:
+			return
+		if result.get("changed", false) or before.get("facing") != _standalone_state.facing:
+			_test_command_history.append({"commands": _test_commands.duplicate()})
+			_test_commands.append(command)
 	_standalone_board.set_board(_standalone_state)
 	if not result.is_empty():
 		_standalone_board.animate_result(result, before)
@@ -1134,8 +1386,57 @@ func _handle_standalone_input(event: InputEvent) -> void:
 	_standalone_won = _standalone_state.is_won()
 	if _standalone_won:
 		_play_sound("goal")
+		if not _replaying and Proof.revision(_test_source) == Proof.revision(document):
+			var candidate: Dictionary = Proof.build(_test_source, _test_commands)
+			if candidate.get("valid", false):
+				_last_proof = candidate
+				proof_recorded.emit(candidate.duplicate(true))
 	_standalone_label.text = "✓" if _standalone_won else "%d / %d" % [_standalone_state.moves, _standalone_state.punches]
-	get_viewport().set_input_as_handled()
+	_publish_test_state()
+
+
+func _publish_test_state() -> void:
+	if _standalone_state == null:
+		return
+	var debug: Array[Dictionary] = _standalone_state.device_debug()
+	var lines: Array[String] = []
+	for entry: Dictionary in debug:
+		if entry.get("behavior", "") == "plate":
+			lines.append("%s · 压板 %s · 触发条件 %s" % [entry.get("id", ""), "按下" if entry.get("pressed", false) else "松开", entry.get("filter", "all")])
+		else:
+			lines.append("%s · 门 %s · 逻辑 %s · 供电 %s · 占用保持 %s" % [entry.get("id", ""), "打开" if entry.get("open", false) else "关闭", entry.get("logic", "any"), str(entry.get("powered_by", [])), str(entry.get("held_open", false))])
+	if lines.is_empty():
+		lines.append("无机关 · 已记录 %d 条命令" % _test_commands.size())
+	if is_instance_valid(_test_debug_label):
+		_test_debug_label.text = "\n".join(lines)
+	test_state_changed.emit(debug, {"active": true, "replaying": _replaying, "moves": _standalone_state.moves, "punches": _standalone_state.punches, "won": _standalone_won, "commands": _test_commands.duplicate(), "proof_valid": not get_last_proof().is_empty()})
+
+
+func play_verified_replay() -> bool:
+	var proof := get_last_proof()
+	if proof.is_empty() or not Proof.verify(document, proof).get("valid", false):
+		if _built:
+			_status.text = "当前关卡没有有效通关证明"
+		return false
+	begin_test()
+	if _standalone_state == null:
+		return false
+	_replaying = true
+	_replay_generation += 1
+	var token := _replay_generation
+	_play_replay_sequence.call_deferred(proof.get("commands", []).duplicate(), token)
+	return true
+
+
+func _play_replay_sequence(commands: Array, token: int) -> void:
+	for command: Variant in commands:
+		if token != _replay_generation or _standalone_state == null:
+			return
+		_execute_test_command(str(command))
+		await get_tree().create_timer(0.16).timeout
+	if token == _replay_generation and _standalone_state != null:
+		_replaying = false
+		_publish_test_state()
 
 
 func _find_object(object_id: String) -> Dictionary:
@@ -1146,7 +1447,7 @@ func _find_object(object_id: String) -> Dictionary:
 
 
 func _play_sound(event: String) -> void:
-	if not _built:
+	if not _built or embedded_mode or Engine.is_editor_hint():
 		return
 	if not sound_requested.get_connections().is_empty():
 		sound_requested.emit(event)

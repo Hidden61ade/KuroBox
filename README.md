@@ -1,69 +1,63 @@
 # KuroBox
 
-一款拳馆里的格子解谜游戏。推木箱，击打沙袋，再借压板打开通路。角色站在哪里、物件停在哪里，是每关要解决的问题。
+拳击主题的格子解谜游戏，使用 Godot 4.6 和 GDScript。木箱可以推一格，沙袋靠出拳移动；通过站位、阻挡和机关安排它们的落点。工程包含八个正式关卡和 Godot Editor 内的关卡工作台。
 
-项目使用 Godot 4.6 和 GDScript，包含八个关卡、开始与选关界面、暂停、设置、通关结算和关卡工坊。通关记录、最好步数与设置保存在 `user://profile.json`；保存时保留备份。
+## 运行游戏
 
-## 运行和操作
+用 Godot 4.6 打开 `project.godot`，按 F5。Windows 导出程序位于本地 `builds/windows/KuroBox.exe`。
 
-用 Godot 4.6 打开 `project.godot`，按 F5 运行。完整流程的入口是 `features/shell/main.tscn`，工坊可以单独按 F6 运行。桌面端使用键盘和鼠标，窗口可缩放，F11 切换全屏。
+- 方向键 / WASD 移动；走向木箱即可推动。
+- Space 朝当前方向出拳。沙袋默认最多前进两格，遇障碍提前停下，角色留在原地。
+- Z 撤销，R 重开，Esc 暂停，Q 返回选关或工坊。
+- F11 切换全屏，M 同时静音或恢复音乐与音效。
 
-开始界面中，红色播放按钮进入训练，领奖台选择关卡，镐头打开工坊。图标悬停显示名称和快捷键。游玩时显示关卡编号、操作图标和小号键帽，说明保留在本文与工坊中。
+目标格不会自动截停沙袋。把所有目标格占满即可通关。进度与设置存入 `user://profile.json`，写入时保留有效备份。
 
-- 方向键或 WASD 移动；靠近木箱后继续向前即可推一格。
-- Space 朝当前方向出拳。沙袋最多前进两格，遇阻提前停下，角色留在原地；拳头不会隔着物件传递，也不会推动木箱。
-- Z 撤销，R 重开，Space 出拳，Q 返回选关或工坊，Esc 暂停。无效动作不计步，撤销会一起还原朝向和机关状态。
-- 底部左侧是撤销和重开，中间是出拳，右侧是全屏、声音和返回。按钮下方的像素键帽对应 Z / R / SPACE / F11 / M / Q；M 同时静音音乐与音效，再按恢复原音量。
-- 把所有目标格占满即可过关。目标格不会让飞行中的沙袋自动停下。
+## 在 Godot Editor 制作关卡
 
-主菜单可以进入关卡工坊，选关页也能导入外部 JSON 直接游玩。设置中可调整声音、背景音乐音量和屏幕震动。
+打开工程后，点击顶部与 2D、3D、Script 并列的 **KuroBox**。也可以从 `Project > Tools > KuroBox 关卡工作台` 进入。插件已在工程中启用；若入口未出现，可在 `Project Settings > Plugins` 检查 KuroBox Workbench。
 
-## 编辑关卡
+左侧关卡库管理内容，中间绘制，右侧原生 Inspector 配置选中的实例。
 
-工坊按格绘制地图，宽高为 4–24 格。地板可以画成不规则形状，再分别摆放墙、目标、出生点、木箱、沙袋和机关。右键只擦当前图层，避免顺手删掉其他内容。
+1. **新建或复制。** 关卡 ID 用于文件与存档引用，标题用于显示。复制从当前内存内容另存，不要求先覆盖原文件；机关 ID 和内部引用会一起重建。
+2. **绘制与布设。** 地板、墙、目标、实体和装置分层。拖刷、矩形、填充、选区复制移动都以整笔撤销；箱子不会擦掉下面的压板。滚轮围绕鼠标缩放，中键拖动画布，“适配全图”恢复视野。
+3. **配置参数。** 选中物件后，在 Inspector 勾选实例覆盖并改值；取消覆盖则跟随类型默认。可调整沙袋击退距离、压板触发对象、门的任一/全部压板条件。压板可通过 Inspector 的连线按钮点击棋盘上的门。类型变体可从已有行为登记，自动出现在图块面板。
+4. **保存草稿。** 缺出生点、目标或机关关联的未完成内容也能保存。草稿和正式内容分开；切换关卡保留未保存会话，关闭时会提示，并留下编辑器恢复副本。
+5. **试关与回放。** “即时试关”使用独立 BoardState，返回后保留作者文档与视角。成功后记录实际操作序列；“回放验证”重新执行。布局或规则参数变化会使旧证明失效，改标题不影响规则证明。
+6. **发布。** 只有结构校验与当前版本的实际重放都通过，才能写入正式关卡并登记到流程。左侧可调整顺序后统一保存；撤回发布会保留草稿，并先处理当前未保存修改。
 
-画笔 B、擦除 E、矩形 R、填充 F、框选 S、移动 M、粘贴 V；Ctrl+Z 撤销，Ctrl+Y 或 Ctrl+Shift+Z 重做。框选复制会重新分配物件 ID，连在选区内部的门和压板会一起复制；移动则保留原 ID。选区越界时整笔拒绝。
+试关下方显示压板是否按下、门的供电来源、组合规则，以及是否因玩家或箱子占门而保持开启。检查结果可以点击定位，Inspector 也能在棋盘上定位选中物件。
 
-选中压板后，用“连线到门”点击目标门，也可以在属性区勾选。F5 立即测试当前文档，Esc 返回编辑。试玩用的是文档副本，玩家和物件的移动不会写回关卡。也可以单独运行 `features/editor/editor.tscn`，不用先经过主菜单。
+磁盘文件被外部修改时会拒绝静默覆盖。可以把当前内存修改复制成新关卡，或先保留恢复副本再重载磁盘版本。
 
-导出格式为 `.kuro.json` 或 `.json`。测试和导出前都会检查坐标、叠放和机关引用；点击错误可以定位到棋盘。检查通过只表示文件结构有效，不保证谜题可解。未导出的修改会提示保留或放弃。详细行为见 [关卡工坊说明](docs/editor_workflow.md)。
+## 单关场景入口
 
-## 内容怎样扩展
+`features/editor/editor.tscn` 可以按 F6 独立运行；游戏菜单中的单关工坊也复用同一绘制控件。它们用于快速编辑与 JSON 导入导出，正式关卡管理以原生工作台为主。
 
-关卡初始布局保存在 `content/levels/`，正式关卡的顺序由其中的 `campaign.json` 决定。标题可以修改，关卡 ID 应保持稳定，存档依赖这个 ID。内置关卡的 `metadata.solution` 记录 U/D/L/R/P 解法命令，测试用实际规则重放它们。
+画笔 B、擦除 E、矩形 R、填充 F、框选 S、移动 M、粘贴 V；Ctrl+Z 撤销，Ctrl+Y / Ctrl+Shift+Z 重做。原生工作台 Ctrl+S 保存草稿。
 
-物件目录在 `content/definitions/objects.json`。同一份定义供规则、编辑器和画面读取。增加已有行为的变体时，可添加稳定类型 ID、参数与贴图；增加新行为还需要在 `core/board_state.gd` 实现规则，在 `core/level_codec.gd` 补校验，再添加规则测试。登记名称不会自动生成新玩法。
+## 数据和协作入口
 
-职责按修改原因划分：
+- `content/levels/`：正式关卡；`campaign.json` 保存运行顺序。
+- `content/workshop/drafts/`：草稿；`proofs/`：绑定规则修订的通关记录。两者不进入游戏发布包。
+- `content/definitions/objects.json`：共享类型目录。类型默认只有一处，实例仅保存 `params` 差异。
+- `core/`：校验、离散规则和重放；不依赖 EditorInterface 或动画帧率。
+- `features/editor/`：绘制和共享试玩；`services/level_workspace.gd` 管理文件与发布。
+- `addons/kurobox_editor/`：原生主屏、Inspector、编辑历史与文档协调。
+- `assets/source/kurobox_boxing.aseprite`：32px 主体的可编辑源；表现映射由类型目录维护，音频事件在 `audio_service.gd`。
 
-- 内容作者维护关卡文件和机关连线；编辑器负责文档、撤销历史与导入导出。
-- 规则程序维护 `BoardState`、物件目录和格式校验。这里不依赖动画或物理帧率。
-- 木箱、拳击手和沙袋在 Aseprite 中绘制，源文件为 `assets/source/kurobox_boxing.aseprite`。UI、环境和特效的现成资源裁切见 `assets/source/reference_mapping.json`。表现集中在 `features/play/board_view.gd`。
-- 音频事件映射在 `features/shell/audio_service.gd`；菜单、存档和场景切换由 `features/shell/` 维护。
+新增同类变体可以使用类型窗口。新增行为还需要实现规则、参数约束、调试状态和测试；登记一个名称不会自动生成玩法。详情见 [架构](docs/architecture.md)、[工作区](docs/workspace_workflow.md) 和 [工作台说明](docs/native_workbench.md)。
 
-关卡定义、运行状态和编辑状态各自保存。试关与正式游玩使用同一个 `BoardState`，避免编辑器里能用、发布后规则却不同。格式有版本，未知版本和坏数据会报错。更多说明见 [实现约定](docs/architecture.md) 与 [接口及关卡格式](docs/implementation_contract.md)。
-
-## 检查
-
-在项目目录执行，下面的 `Godot` 指 Godot 4.6 控制台程序：
+## 检查和导出
 
 ```powershell
-Godot --headless --path . --log-file "$PWD/evidence/import.log" --editor --quit
-Godot --headless --path . --log-file "$PWD/evidence/core.log" --script res://tests/test_core.gd
-Godot --headless --path . --log-file "$PWD/evidence/editor.log" --script res://tests/test_editor.gd
-Godot --headless --path . --log-file "$PWD/evidence/flow.log" --script res://tests/test_flow.gd
+./tools/validate.ps1 -GodotBin "Godot 4.6 控制台程序路径"
+./tools/test_native_editor.ps1 -GodotGui "Godot 4.6 GUI 程序路径"
+./tools/export_windows.ps1 -GodotBin "Godot 4.6 控制台程序路径" -FetchTemplates
 ```
 
-核心检查覆盖碰撞、沙袋位移、机关、撤销、坏数据和八关记录解法；编辑器检查覆盖图层、整笔撤销、复制移动、连线与试关副本。脚本输出检查数和失败项，失败时返回非零退出码。自动重放能证明已有布局存在解法，新手是否能看懂、声音是否合适，仍需要试玩判断。
+原生测试会在 `.tools/` 创建隔离工程和便携编辑器配置，验证真实 Inspector、编辑历史、试关、发布、撤回并保存 Editor 截图。不要直接对制作工程运行原生 Smoke 参数。Windows 模板缺失时才需要 `-FetchTemplates`，工具从官方发布包只取 Windows 模板，不安装到全局目录。
 
-当前不含关卡求解器、手柄操作或在线关卡分享。背景音乐为本项目合成的 20 秒循环，音乐与音效的最终音量和听感仍需要实际试听。第三方 UI、字体和声音的来源及署名见 [CREDITS](CREDITS.md)；逐项资源记录见 [素材清单](docs/asset_manifest.md)。
+源码、关卡与可编辑素材提交 Git；引擎缓存、恢复副本、模板和本地构建不提交。发布程序还会单独重放正式清单，验证实际打包后的数据可读取。
 
-## 视觉与导出
-
-双色地格直接使用 Circuit Delay 原包的两张 16 像素纹理，按格子坐标奇偶交替。背景平铺同包的斜条纹，持续滚动，并叠加原透明气氛层。滚动速度是本项目的可调参数，原脚本速度未恢复。转场的 11 条斜带、颜色键和两个 0.46 秒动画来自原场景静态轨道，换场发生在全遮盖时。
-
-一键检查：`./tools/validate.ps1 -GodotBin "Godot 4.6 控制台程序路径"`。
-
-导出 Windows：`./tools/export_windows.ps1 -GodotBin "Godot 4.6 控制台程序路径" -FetchTemplates`。该开关从 Godot 官方发布包只取 Windows 模板，校验成员 CRC 并记录 SHA-256；不会安装到全局目录。已有模板时不需要该开关。输出在 `builds/windows/KuroBox.exe`，导出后会在实际 release runtime 中重放八关并检查工坊试玩隔离。
-
-源码、可编辑素材和关卡提交到 Git；`.godot`、运行存档、模板和本地构建不提交。最新检查结果见 `evidence/validation_summary.json`。自动检查证明的范围与首次试玩、音频听感分别记录。
+当前没有完整求解器、在线分享或手柄支持。结构合法不等于可解，重放证明只说明当前规则下存在这一条通关路径。音频已检查解码、峰值与循环边界，主观听感和首次玩家理解度仍需要试玩。

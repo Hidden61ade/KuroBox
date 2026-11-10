@@ -1,8 +1,10 @@
+@tool
 class_name BoardView
 extends Control
 
 signal cell_pressed(cell: Vector2i, button: int)
 signal cell_dragged(cell: Vector2i, button: int)
+signal view_changed
 
 var editor_mode: bool = false
 var cell_size: float = 48.0
@@ -18,13 +20,23 @@ var _tween: Tween
 var _last_cell := Vector2i(-100, -100)
 var _display_width: int = 8
 var _display_height: int = 6
+var _zoom: float = 1.0
+var _pan := Vector2.ZERO
+var _fit_cell_size: float = 48.0
+var _panning: bool = false
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	focus_mode = Control.FOCUS_ALL
+	clip_contents = true
 	custom_minimum_size = Vector2(200, 200)
 	resized.connect(_layout_board)
+	_load_textures()
+	_layout_board()
+
+func _load_textures() -> void:
+	_textures.clear()
 	for sprite: String in ["floor", "wall", "goal", "wood", "bag", "plate", "door", "door_open", "player_down", "player_up", "player_left", "player_right", "player_punch_down", "player_punch_up", "player_punch_left", "player_punch_right"]:
 		var path := "res://assets/sprites/" + sprite + ".png"
 		var reference_path := "res://assets/sprites/ref_" + sprite + ".png"
@@ -48,7 +60,10 @@ func _ready() -> void:
 		var path := "res://assets/effects/ref_punch_arc_%d.png" % index
 		if ResourceLoader.exists(path):
 			_textures["punch_arc_%d" % index] = load(path)
-	_layout_board()
+
+func refresh_catalog() -> void:
+	_load_textures()
+	queue_redraw()
 
 func set_board(state: BoardState) -> void:
 	board = state
@@ -69,9 +84,42 @@ func _layout_board() -> void:
 	var fit := minf((size.x - 48.0) / _display_width, (size.y - 48.0) / _display_height)
 	# Original ground is 16px and authored boxing sprites are 32px.
 	# Keep ground pixels at an integer scale at every supported board size.
-	cell_size = maxf(16.0, floorf(minf(fit, 64.0) / 16.0) * 16.0)
-	board_origin = ((size - Vector2(_display_width, _display_height) * cell_size) * 0.5).floor()
+	_fit_cell_size = maxf(16.0, floorf(minf(fit, 64.0) / 16.0) * 16.0)
+	cell_size = maxf(4.0, _fit_cell_size * _zoom)
+	board_origin = (size - Vector2(_display_width, _display_height) * cell_size) * 0.5 + _pan
 	queue_redraw()
+	view_changed.emit()
+
+func fit_view() -> void:
+	_zoom = 1.0
+	_pan = Vector2.ZERO
+	_layout_board()
+
+func get_view_state() -> Dictionary:
+	return {"zoom": _zoom, "pan": _pan}
+
+func restore_view_state(state: Dictionary) -> void:
+	_zoom = clampf(float(state.get("zoom", 1.0)), 0.25, 8.0)
+	var value: Variant = state.get("pan", Vector2.ZERO)
+	_pan = value if value is Vector2 else Vector2(float(value[0]), float(value[1])) if value is Array and value.size() == 2 else Vector2.ZERO
+	_layout_board()
+
+func zoom_at(factor: float, local_position: Vector2) -> void:
+	if factor <= 0.0 or not is_finite(factor):
+		return
+	var cell_position := (local_position - board_origin) / cell_size
+	_zoom = clampf(_zoom * factor, 0.25, 8.0)
+	cell_size = maxf(4.0, _fit_cell_size * _zoom)
+	var centered := (size - Vector2(_display_width, _display_height) * cell_size) * 0.5
+	_pan = local_position - cell_position * cell_size - centered
+	_layout_board()
+
+func pan_by(delta: Vector2) -> void:
+	_pan += delta
+	_layout_board()
+
+func focus_cell(cell: Vector2i) -> void:
+	pan_by(size * 0.5 - cell_to_rect(cell).get_center())
 
 func _level() -> Dictionary:
 	return board.level if board != null else _preview
@@ -88,7 +136,19 @@ func _gui_input(event: InputEvent) -> void:
 			grab_focus()
 		return
 	if event is InputEventMouseButton:
+		if event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN] and event.pressed:
+			grab_focus()
+			zoom_at(1.25 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 0.8, event.position)
+			accept_event()
+			return
+		if event.button_index == MOUSE_BUTTON_MIDDLE:
+			grab_focus()
+			_panning = event.pressed
+			accept_event()
+			return
 		if event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
+			if event.pressed:
+				grab_focus()
 			_last_cell = screen_to_cell(event.position)
 			if event.pressed:
 				cell_pressed.emit(_last_cell, event.button_index)
@@ -96,6 +156,10 @@ func _gui_input(event: InputEvent) -> void:
 				_last_cell = Vector2i(-100, -100)
 			accept_event()
 	elif event is InputEventMouseMotion:
+		if _panning and event.button_mask & MOUSE_BUTTON_MASK_MIDDLE:
+			pan_by(event.relative)
+			accept_event()
+			return
 		var cell := screen_to_cell(event.position)
 		if cell != _last_cell:
 			var button := MOUSE_BUTTON_LEFT if event.button_mask & MOUSE_BUTTON_MASK_LEFT else MOUSE_BUTTON_RIGHT if event.button_mask & MOUSE_BUTTON_MASK_RIGHT else 0

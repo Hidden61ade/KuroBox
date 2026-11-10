@@ -1,3 +1,4 @@
+@tool
 class_name LevelCodec
 extends RefCounted
 ## Wire format boundary. Validation precedes normalization, simulation and disk writes.
@@ -39,10 +40,20 @@ static func normalize(data: Dictionary) -> Dictionary:
 					item["targets"] = []
 				if _is_cell(item.get("cell")):
 					item["cell"] = [int(item["cell"][0]), int(item["cell"][1])]
+				if item.get("params") is Dictionary and _integer(item["params"].get("punch_distance")):
+					item["params"]["punch_distance"] = int(item["params"]["punch_distance"])
 	return result
 
 
 static func validate(data: Dictionary) -> Array[String]:
+	return _validate(data, false)
+
+
+static func validate_draft(data: Dictionary) -> Array[String]:
+	return _validate(data, true)
+
+
+static func _validate(data: Dictionary, draft: bool) -> Array[String]:
 	var errors: Array[String] = []
 	if not _integer(data.get("schema_version")) or int(data.get("schema_version", -1)) != SCHEMA_VERSION:
 		errors.append("schema_version: only version 1 is supported.")
@@ -76,23 +87,28 @@ static func validate(data: Dictionary) -> Array[String]:
 		layer_maps[field] = mapped
 	var floors: Dictionary = layer_maps["floor"]
 	var blocked: Dictionary = layer_maps["walls"]
-	if floors.is_empty():
+	if floors.is_empty() and not draft:
 		errors.append("floor: draw at least one floor cell.")
 	for field: String in ["walls", "goals"]:
 		for cell: Vector2i in layer_maps[field]:
-			if not floors.has(cell):
+			if not floors.has(cell) and not draft:
 				errors.append("%s: cell %s needs floor beneath it." % [field, cell])
 			if field == "goals" and blocked.has(cell):
 				errors.append("goals: cell %s overlaps a wall." % cell)
-	if layer_maps["goals"].is_empty():
+	if layer_maps["goals"].is_empty() and not draft:
 		errors.append("goals: place at least one target.")
 	var player_valid := _is_cell(data.get("player"))
 	var spawn := Vector2i(-1, -1)
-	if not player_valid:
+	var missing_spawn := not data.has("player") or data.get("player") == null or (player_valid and int(data["player"][0]) == -1 and int(data["player"][1]) == -1)
+	if draft and missing_spawn:
+		player_valid = false
+	elif not player_valid:
 		errors.append("player: expected one spawn cell with integer coordinates.")
 	else:
 		spawn = Vector2i(int(data["player"][0]), int(data["player"][1]))
-		if not floors.has(spawn) or blocked.has(spawn):
+		if dimensions_valid and not _in_bounds(spawn, size):
+			errors.append("player: spawn is outside the map.")
+		if (not floors.has(spawn) and not draft) or blocked.has(spawn):
 			errors.append("player: spawn must be on clear floor.")
 	var direction: Variant = data.get("facing", [1, 0])
 	if not _is_cell(direction) or (abs(int(direction[0])) + abs(int(direction[1])) != 1):
@@ -126,11 +142,15 @@ static func validate(data: Dictionary) -> Array[String]:
 				errors.append("objects[%d].type: unknown type '%s'." % [index, str(item.get("type", ""))])
 			elif behavior in ["wood", "bag"]:
 				movable_count += 1
+			if not definition.is_empty():
+				errors.append_array(Catalog.validate_parameters(item))
 			if not _is_cell(item.get("cell")):
 				errors.append("objects[%d].cell: expected two integer coordinates." % index)
 			else:
 				var cell := Vector2i(int(item["cell"][0]), int(item["cell"][1]))
-				if not floors.has(cell) or blocked.has(cell):
+				if dimensions_valid and not _in_bounds(cell, size):
+					errors.append("objects[%d]: '%s' is outside the map." % [index, item_id])
+				if (not floors.has(cell) and not draft) or blocked.has(cell):
 					errors.append("objects[%d]: '%s' needs clear floor." % [index, item_id])
 				if behavior in ["wood", "bag"]:
 					if solid_cells.has(cell):
@@ -144,7 +164,7 @@ static func validate(data: Dictionary) -> Array[String]:
 					device_cells[cell] = item_id
 			if not item.get("targets", []) is Array:
 				errors.append("objects[%d].targets: expected an array of gate IDs." % index)
-	if movable_count < layer_maps["goals"].size():
+	if movable_count < layer_maps["goals"].size() and not draft:
 		errors.append("goals: %d targets need at least %d boxes; only %d exist." % [layer_maps["goals"].size(), layer_maps["goals"].size(), movable_count])
 	var linked_doors: Dictionary = {}
 	for item_id: String in ids:
@@ -154,16 +174,20 @@ static func validate(data: Dictionary) -> Array[String]:
 		if not links is Array:
 			continue
 		if definition.get("behavior") == "plate":
-			if links.is_empty():
+			if links.is_empty() and not draft:
 				errors.append("plate '%s': link at least one gate." % item_id)
 			var seen: Dictionary = {}
 			for target: Variant in links:
-				if not target is String or not ids.has(target):
-					errors.append("plate '%s': missing gate reference '%s'." % [item_id, str(target)])
+				if not target is String:
+					errors.append("plate '%s': gate references must be strings." % item_id)
 					continue
 				if seen.has(target):
 					errors.append("plate '%s': duplicate gate reference '%s'." % [item_id, target])
 				seen[target] = true
+				if not ids.has(target):
+					if not draft:
+						errors.append("plate '%s': missing gate reference '%s'." % [item_id, target])
+					continue
 				var target_definition: Dictionary = Catalog.get_type(str(ids[target].get("type", "")))
 				if target_definition.get("behavior") != "door":
 					errors.append("plate '%s': target '%s' is not a gate." % [item_id, target])
@@ -173,7 +197,7 @@ static func validate(data: Dictionary) -> Array[String]:
 			errors.append("object '%s': only pressure plates may define targets." % item_id)
 	for item_id: String in ids:
 		var definition: Dictionary = Catalog.get_type(str(ids[item_id].get("type", "")))
-		if definition.get("behavior") == "door" and not linked_doors.has(item_id):
+		if definition.get("behavior") == "door" and not linked_doors.has(item_id) and not draft:
 			errors.append("gate '%s': no pressure plate links to it." % item_id)
 	if data.has("metadata") and not data["metadata"] is Dictionary:
 		errors.append("metadata: expected an object.")

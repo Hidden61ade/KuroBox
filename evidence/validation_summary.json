@@ -3,14 +3,20 @@
   "engine": "4.6.stable.official.89cea1439",
   "automated_checks": {
     "core": 166,
+    "parameters": 95,
+    "replay": 38,
+    "workspace": 102,
     "editor": 54,
+    "editor_workbench": 54,
+    "recovery": 20,
     "profile": 12,
-    "assets": 49,
+    "assets": 50,
     "transition": 32,
-    "flow": 27,
-    "hud_footer": 81
+    "flow": 28,
+    "hud_footer": 81,
+    "native_editor": 46
   },
-  "total_checks": 421,
+  "total_checks": 778,
   "failures": [],
   "campaign": [
     {
@@ -113,8 +119,8 @@
   ],
   "windows_release": {
     "path": "builds/windows/KuroBox.exe",
-    "bytes": 104920544,
-    "sha256": "735b359f08c4f5bb297683860f03e6d9c9e857a6e6581e29769713144d3d55ba",
+    "bytes": 104960464,
+    "sha256": "21d164d754b8381ed1206c2d87f3c01d07b5253b4588a646fd1f1dfaa49ecaed",
     "self_check": {
       "editor_preserved": true,
       "engine": "4.6-stable (official)",
@@ -356,5 +362,28 @@
       }
     ],
     "native_capture": "evidence/hud_footer_detail.webp"
+  },
+  "native_editor": {
+    "checks": 46,
+    "engine": "4.6-stable (official)",
+    "failures": [],
+    "native_editor": true,
+    "screenshots": [
+      "res://evidence/native_editor_parameters.png",
+      "res://evidence/native_editor_published.png",
+      "res://evidence/native_editor_mechanisms.png",
+      "res://evidence/native_editor_library.png"
+    ],
+    "workspace": "isolated copy of the project"
+  },
+  "ui_flow": {
+    "capture_scope": "UI flow and responsive layout using test fixtures; not authored campaign content",
+    "checks": 28,
+    "content_source": "isolated_flow_fixtures",
+    "engine": "4.6-stable (official)",
+    "failures": [],
+    "flow_fixture_count": 8,
+    "published_levels_loaded": 8,
+    "screenshots": false
   }
 }

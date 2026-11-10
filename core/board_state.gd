@@ -1,3 +1,4 @@
+@tool
 class_name BoardState
 extends RefCounted
 ## Deterministic command model. Rendering, audio and input never own puzzle state.
@@ -18,6 +19,7 @@ var _solids: Dictionary[Vector2i, String] = {}
 var _devices: Dictionary[Vector2i, String] = {}
 var _history: Array[Dictionary] = []
 var _initial_snapshot: Dictionary = {}
+var _device_debug: Array[Dictionary] = []
 
 
 func setup(source: Dictionary) -> void:
@@ -30,6 +32,7 @@ func setup(source: Dictionary) -> void:
 	_initial_snapshot.clear()
 	_solids.clear()
 	_devices.clear()
+	_device_debug.clear()
 	player = Vector2i.ZERO
 	facing = Vector2i.RIGHT
 	moves = 0
@@ -49,7 +52,10 @@ func setup(source: Dictionary) -> void:
 	for raw: Dictionary in level["objects"]:
 		var runtime := raw.duplicate(true)
 		runtime["cell"] = _cell(raw["cell"])
-		runtime["behavior"] = Catalog.get_type(str(raw["type"])).get("behavior", "")
+		# Freeze the checked effective rules for this run. Catalog edits affect the
+		# next setup/replay rather than changing an animation's outcome mid-command.
+		runtime["_definition"] = Catalog.resolve_instance(raw)
+		runtime["behavior"] = runtime["_definition"].get("behavior", "")
 		if runtime["behavior"] == "door":
 			runtime["open"] = false
 		elif runtime["behavior"] == "plate":
@@ -71,7 +77,7 @@ func step(direction: Vector2i) -> Dictionary:
 		return _result(false, "blocked", "", player, destination)
 	var item_id := object_at(destination)
 	if not item_id.is_empty():
-		var definition := Catalog.get_type(str(objects[item_id]["type"]))
+		var definition: Dictionary = objects[item_id]["_definition"]
 		var next_cell := destination + direction
 		if not definition.get("pushable", false) or not can_enter(next_cell):
 			_remember_facing(before)
@@ -98,7 +104,7 @@ func punch() -> Dictionary:
 	var item_id := object_at(adjacent)
 	if item_id.is_empty():
 		return _result(false, "blocked", "", adjacent, adjacent)
-	var definition := Catalog.get_type(str(objects[item_id]["type"]))
+	var definition: Dictionary = objects[item_id]["_definition"]
 	if not definition.get("punchable", false):
 		return _result(false, "blocked", item_id, adjacent, adjacent)
 	var landing := preview_punch()
@@ -118,7 +124,7 @@ func preview_punch() -> Vector2i:
 	var item_id := object_at(adjacent)
 	if item_id.is_empty():
 		return player
-	var definition := Catalog.get_type(str(objects[item_id]["type"]))
+	var definition: Dictionary = objects[item_id]["_definition"]
 	if not definition.get("punchable", false):
 		return player
 	var landing := adjacent
@@ -177,21 +183,60 @@ func _terrain_open(cell: Vector2i) -> bool:
 
 
 func _settle_devices() -> void:
-	var activated: Dictionary = {}
+	_device_debug.clear()
+	var incoming: Dictionary = {}
+	var powered: Dictionary = {}
 	for item_id: String in objects:
 		var item: Dictionary = objects[item_id]
 		if item["behavior"] != "plate":
 			continue
 		var cell: Vector2i = item["cell"]
-		item["pressed"] = player == cell or _solids.has(cell)
-		if item["pressed"]:
-			for target: String in item.get("targets", []):
-				activated[target] = true
+		var filter: String = item["_definition"].get("activation_filter", "all")
+		var occupants: Array[String] = []
+		var pressed_by: Array[String] = []
+		if player == cell:
+			occupants.append("player")
+			if filter in ["all", "player"]:
+				pressed_by.append("player")
+		if _solids.has(cell):
+			occupants.append(_solids[cell])
+			if filter in ["all", "boxes"]:
+				pressed_by.append(_solids[cell])
+		item["pressed"] = not pressed_by.is_empty()
+		for target: String in item.get("targets", []):
+			if not incoming.has(target):
+				incoming[target] = []
+			if not powered.has(target):
+				powered[target] = []
+			incoming[target].append(item_id)
+			if item["pressed"]:
+				powered[target].append(item_id)
+		var reason := "Pressed by %s (filter: %s)." % [", ".join(pressed_by), filter] if item["pressed"] else "Not pressed: %s; filter: %s." % ["empty" if occupants.is_empty() else "occupant excluded", filter]
+		_device_debug.append({"id": item_id, "behavior": "plate", "pressed": item["pressed"], "filter": filter, "activation_filter": filter, "powered_by": pressed_by, "occupants": occupants, "targets": item.get("targets", []).duplicate(), "held_open": false, "reason": reason})
 	for item_id: String in objects:
 		var item: Dictionary = objects[item_id]
 		if item["behavior"] == "door":
 			var cell: Vector2i = item["cell"]
-			item["open"] = activated.has(item_id) or player == cell or _solids.has(cell)
+			var linked: Array = incoming.get(item_id, [])
+			var active: Array = powered.get(item_id, [])
+			linked.sort()
+			active.sort()
+			var logic: String = item["_definition"].get("gate_logic", "any")
+			var receives_power := not linked.is_empty() and (active.size() == linked.size() if logic == "all" else not active.is_empty())
+			var occupants: Array[String] = []
+			if player == cell:
+				occupants.append("player")
+			if _solids.has(cell):
+				occupants.append(_solids[cell])
+			var held := not occupants.is_empty() and not receives_power
+			item["open"] = receives_power or not occupants.is_empty()
+			var reason := "Held open by %s; %d/%d plates active (%s)." % [", ".join(occupants), active.size(), linked.size(), logic] if held else "%s: %d/%d plates active (%s)." % ["Powered" if receives_power else "Closed", active.size(), linked.size(), logic]
+			_device_debug.append({"id": item_id, "behavior": "door", "open": item["open"], "powered": receives_power, "logic": logic, "gate_logic": logic, "linked_plates": linked.duplicate(), "powered_by": active.duplicate(), "active_inputs": active.size(), "required_inputs": linked.size(), "held_open": held, "held_by": occupants if held else [], "occupants": occupants, "reason": reason})
+	_device_debug.sort_custom(func(left: Dictionary, right: Dictionary) -> bool: return str(left["id"]) < str(right["id"]))
+
+
+func device_debug() -> Array[Dictionary]:
+	return _device_debug.duplicate(true)
 
 
 func _reindex() -> void:
@@ -212,6 +257,7 @@ func _restore(saved: Dictionary) -> void:
 	moves = int(saved["moves"])
 	punches = int(saved["punches"])
 	_reindex()
+	_settle_devices()
 
 
 func _remember_facing(before: Dictionary) -> void:

@@ -1,6 +1,10 @@
 {
-	"checks": 27,
+	"capture_scope": "UI flow and responsive layout using test fixtures; not authored campaign content",
+	"checks": 28,
+	"content_source": "isolated_flow_fixtures",
 	"engine": "4.6-stable (official)",
 	"failures": [],
-	"screenshots": true
+	"flow_fixture_count": 8,
+	"published_levels_loaded": 8,
+	"screenshots": false
 }

@@ -48,7 +48,10 @@ func _board(data: Dictionary) -> Board:
 
 
 func _test_catalog() -> void:
-	_check(Catalog.all_types().size() == 4, "four shared object types load")
+	var registered: Dictionary = {}
+	for definition: Dictionary in Catalog.all_types():
+		registered[str(definition["id"])] = true
+	_check(registered.has_all(["wood", "bag", "plate", "door"]), "four base object types load while registered variants remain allowed")
 	_check(Catalog.get_type("missing").is_empty(), "unknown type does not fall back")
 	var wood: Dictionary = Catalog.get_type("wood")
 	wood["pushable"] = false
@@ -329,11 +332,18 @@ func _test_campaign() -> void:
 	_check(manifest_file != null, "campaign manifest exists")
 	if manifest_file == null:
 		return
-	var manifest: Dictionary = JSON.parse_string(manifest_file.get_as_text())
+	var manifest: Variant = JSON.parse_string(manifest_file.get_as_text())
 	manifest_file.close()
-	_check(manifest["levels"].size() == 8, "campaign contains eight explicit ordered levels")
+	var valid_manifest: bool = manifest is Dictionary and manifest.get("levels") is Array and not manifest["levels"].is_empty()
+	_check(valid_manifest, "campaign contains a non-empty explicit published level list")
+	if not valid_manifest:
+		return
 	var seen_ids: Dictionary = {}
-	for path: String in manifest["levels"]:
+	for raw_path: Variant in manifest["levels"]:
+		if not raw_path is String or str(raw_path).strip_edges().is_empty():
+			_check(false, "published level paths must be non-empty strings")
+			continue
+		var path: String = raw_path
 		var data := Codec.load_file(path)
 		_check(not data.is_empty(), "campaign document loads: %s %s" % [path, str(Codec.last_errors)])
 		if data.is_empty():
@@ -343,7 +353,7 @@ func _test_campaign() -> void:
 		var state := _board(data)
 		var initial := state.snapshot()
 		var commands: Array = data["metadata"]["solution"]
-		_check(not commands.is_empty(), "campaign solution is recorded: %s" % data["id"])
+		_check(not commands.is_empty() or state.is_won(), "published level has recorded commands or an already solved initial state: %s" % data["id"])
 		for command: String in commands:
 			match command:
 				"U": state.step(Vector2i.UP)

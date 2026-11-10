@@ -1,0 +1,12 @@
+{
+  "commands": [
+    "P"
+  ],
+  "errors": [],
+  "level_id": "workshop_punch_3",
+  "moves": 1,
+  "proof_version": 1,
+  "punches": 1,
+  "revision": "6da47f9e08caf11139802c6e4bd2676bc357df53aca75453764c48a6a7587da0",
+  "valid": true
+}
