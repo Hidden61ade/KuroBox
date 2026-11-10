@@ -1,0 +1,12 @@
+{
+  "levels": [
+    "res://content/levels/01_first_step.json",
+    "res://content/levels/02_around_the_corner.json",
+    "res://content/levels/03_first_punch.json",
+    "res://content/levels/04_wall_as_brake.json",
+    "res://content/levels/05_make_a_stop.json",
+    "res://content/levels/06_clear_your_corner.json",
+    "res://content/levels/07_hold_the_gate.json",
+    "res://content/levels/08_tag_team.json"
+  ]
+}

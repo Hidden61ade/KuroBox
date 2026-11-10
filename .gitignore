@@ -1,0 +1,17 @@
+.godot/
+.gdskills/
+.tools/
+runtime/
+vulkan/
+objectdb_snapshots/
+logs/
+builds/
+*.tmp
+*.bak
+*.log
+*.zip
+tools/__pycache__/
+tools/asset_reference_conversion/
+tools/reference_inspect/
+evidence/*.png
+evidence/*.webp

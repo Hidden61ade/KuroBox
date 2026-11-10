@@ -1,0 +1,324 @@
+[
+  {
+    "output": "assets/sprites/ref_goal.png",
+    "source": "assets/ui/circuit_all.png",
+    "rect": [
+      32,
+      0,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/sprites/ref_wall.png",
+    "source": "assets/ui/circuit_all.png",
+    "rect": [
+      88,
+      128,
+      32,
+      32
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/effects/ref_punch_arc_0.png",
+    "source": "assets/effects/supplied_effects_32.png",
+    "rect": [
+      0,
+      224,
+      32,
+      32
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/effects/ref_punch_arc_1.png",
+    "source": "assets/effects/supplied_effects_32.png",
+    "rect": [
+      32,
+      224,
+      32,
+      32
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/effects/ref_punch_arc_2.png",
+    "source": "assets/effects/supplied_effects_32.png",
+    "rect": [
+      64,
+      224,
+      32,
+      32
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/effects/ref_punch_arc_3.png",
+    "source": "assets/effects/supplied_effects_32.png",
+    "rect": [
+      96,
+      224,
+      32,
+      32
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/effects/ref_punch_arc_4.png",
+    "source": "assets/effects/supplied_effects_32.png",
+    "rect": [
+      128,
+      224,
+      32,
+      32
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/effects/ref_punch_arc_5.png",
+    "source": "assets/effects/supplied_effects_32.png",
+    "rect": [
+      160,
+      224,
+      32,
+      32
+    ],
+    "flip_horizontal": false,
+    "note": "Source cell is transparent; retain as the animation end frame."
+  },
+  {
+    "output": "assets/ui/icon_play.png",
+    "source": "assets/ui/circuit_start_normal.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_next.png",
+    "source": "assets/ui/circuit_start_normal.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_levels.png",
+    "source": "assets/ui/sprout/all_icons.png",
+    "rect": [
+      144,
+      16,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_settings.png",
+    "source": "assets/ui/sprout/all_icons.png",
+    "rect": [
+      144,
+      0,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_check.png",
+    "source": "assets/ui/sprout/all_icons.png",
+    "rect": [
+      144,
+      32,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_workshop.png",
+    "source": "assets/ui/supplied_items.png",
+    "rect": [
+      64,
+      0,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_back.png",
+    "source": "assets/ui/circuit_Button_small2.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_restart.png",
+    "source": "assets/ui/circuit_Button_small6.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_undo.png",
+    "source": "assets/ui/circuit_Button_small6.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_exit.png",
+    "source": "assets/ui/circuit_Button_small2.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_volume.png",
+    "source": "assets/ui/circuit_Button_small4.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_fullscreen.png",
+    "source": "assets/ui/circuit_Button_small8.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/sprites/ref_plate.png",
+    "source": "assets/ui/circuit_all.png",
+    "rect": [
+      64,
+      64,
+      48,
+      48
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/sprites/ref_door.png",
+    "source": "assets/ui/circuit_all.png",
+    "rect": [
+      32,
+      64,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/sprites/ref_door_open.png",
+    "source": "assets/ui/circuit_all.png",
+    "rect": [
+      32,
+      64,
+      16,
+      16
+    ],
+    "flip_horizontal": false,
+    "alpha_multiplier": 0.22
+  },
+  {
+    "output": "assets/ui/icon_music.png",
+    "source": "assets/ui/circuit_Button_small4.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_quit.png",
+    "source": "assets/ui/circuit_Button_small2.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_punch.png",
+    "source": "assets/sprites/boxing_player_punch_up.png",
+    "rect": [
+      21,
+      0,
+      9,
+      7
+    ],
+    "composition": {
+      "canvas": [
+        16,
+        16
+      ],
+      "parts": [
+        {
+          "source": "assets/sprites/boxing_player_punch_up.png",
+          "rect": [
+            21,
+            0,
+            9,
+            7
+          ],
+          "position": [
+            3,
+            3
+          ]
+        },
+        {
+          "source": "assets/sprites/boxing_player_down.png",
+          "rect": [
+            7,
+            22,
+            2,
+            2
+          ],
+          "position": [
+            7,
+            10
+          ]
+        }
+      ]
+    },
+    "aseprite_source": "assets/source/kurobox_punch_icon.aseprite",
+    "note": "Existing pixels cropped and composed via Aseprite MCP; no new pixel drawing."
+  },
+  {
+    "output": "assets/ui/icon_import.png",
+    "source": "assets/ui/sprout/all_icons.png",
+    "rect": [
+      96,
+      32,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_info.png",
+    "source": "assets/ui/sprout/all_icons.png",
+    "rect": [
+      160,
+      0,
+      16,
+      16
+    ],
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_pause.png",
+    "source": "assets/ui/sprout/settings_buttons.png",
+    "rect": [
+      6,
+      178,
+      4,
+      12
+    ],
+    "composition": {
+      "canvas": [
+        16,
+        16
+      ],
+      "placements": [
+        [
+          3,
+          1
+        ],
+        [
+          9,
+          1
+        ]
+      ]
+    },
+    "note": "Duplicate the supplied volume-strip pixels; no new pixel artwork."
+  }
+]

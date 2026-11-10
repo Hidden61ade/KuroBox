@@ -1,2 +1,6 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Text files use LF; binary assets remain auto-detected.
+* text=auto eol=lf
+# Preserve third-party license text; upstream trailing spaces are intentional.
+assets/audio/UI_Soundpack_LICENSE.txt whitespace=-trailing-space
+assets/source/Jamkit_Sokoban_LICENSE.txt whitespace=-trailing-space
+assets/ui/sprout/read_me.txt whitespace=-trailing-space

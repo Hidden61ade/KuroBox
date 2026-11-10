@@ -1,0 +1,135 @@
+{
+  "date": "2026-11-10",
+  "engine": "4.6.stable.official.89cea1439",
+  "automated_checks": {
+    "core": 166,
+    "editor": 54,
+    "profile": 12,
+    "assets": 46,
+    "transition": 32,
+    "flow": 27
+  },
+  "total_checks": 337,
+  "failures": [],
+  "campaign": [
+    {
+      "commands": 2,
+      "id": "round_01",
+      "moves": 2,
+      "punches": 0,
+      "won": true
+    },
+    {
+      "commands": 6,
+      "id": "round_02",
+      "moves": 6,
+      "punches": 0,
+      "won": true
+    },
+    {
+      "commands": 1,
+      "id": "round_03",
+      "moves": 1,
+      "punches": 1,
+      "won": true
+    },
+    {
+      "commands": 4,
+      "id": "round_04",
+      "moves": 3,
+      "punches": 1,
+      "won": true
+    },
+    {
+      "commands": 13,
+      "id": "round_05",
+      "moves": 12,
+      "punches": 1,
+      "won": true
+    },
+    {
+      "commands": 5,
+      "id": "round_06",
+      "moves": 4,
+      "punches": 1,
+      "won": true
+    },
+    {
+      "commands": 6,
+      "id": "round_07",
+      "moves": 5,
+      "punches": 2,
+      "won": true
+    },
+    {
+      "commands": 19,
+      "id": "round_08",
+      "moves": 18,
+      "punches": 2,
+      "won": true
+    }
+  ],
+  "rendered_flow": {
+    "renderer": "OpenGL Compatibility",
+    "screens": [
+      "menu",
+      "select",
+      "play",
+      "pause",
+      "complete",
+      "editor"
+    ],
+    "window_sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        960,
+        640
+      ]
+    ],
+    "actual_input_dispatch": true
+  },
+  "aseprite_source": {
+    "path": "assets/source/kurobox_boxing.aseprite",
+    "size": [
+      32,
+      32
+    ],
+    "frames": 10,
+    "layers": [
+      "Shadow",
+      "Silhouette",
+      "Features"
+    ],
+    "creation": "Aseprite MCP draw_pixels_at and export_frame"
+  },
+  "limits": [
+    "First-time player comprehension has not been tested with independent players.",
+    "Audio decoded and played through the application; subjective listening/mix acceptance remains unconfirmed.",
+    "Reference scrolling speed was not recovered; stripe art and transition animation tracks are sourced statically."
+  ],
+  "windows_release": {
+    "path": "builds/windows/KuroBox.exe",
+    "bytes": 104913048,
+    "sha256": "fbaf41ba160b3acad45989c5b541545e4d0f143482857ec904863df3d2c5de72",
+    "self_check": {
+      "editor_preserved": true,
+      "engine": "4.6-stable (official)",
+      "failures": [],
+      "levels_won": 8
+    },
+    "clean_exit": true
+  },
+  "visual_reference": {
+    "floor_even": "#176d4c",
+    "floor_odd": "#335c62",
+    "ground_native_pixels": 16,
+    "stripe_period_pixels": 48,
+    "transition_bands": 11,
+    "cover_seconds": 0.46,
+    "reveal_seconds": 0.46,
+    "source": "Static resources from supplied Circuit Delay publication; no original game execution used to derive animation parameters."
+  }
+}

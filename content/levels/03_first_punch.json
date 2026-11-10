@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "id": "round_03",
+  "title": "FIRST PUNCH",
+  "width": 8,
+  "height": 6,
+  "floor": [
+    [
+      2,
+      1
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      4,
+      2
+    ],
+    [
+      5,
+      2
+    ],
+    [
+      6,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      3
+    ],
+    [
+      5,
+      3
+    ],
+    [
+      6,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4,
+      4
+    ],
+    [
+      5,
+      4
+    ]
+  ],
+  "walls": [
+    [
+      4,
+      1
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "goals": [
+    [
+      5,
+      2
+    ]
+  ],
+  "player": [
+    2,
+    2
+  ],
+  "facing": [
+    1,
+    0
+  ],
+  "objects": [
+    {
+      "id": "bag_01",
+      "type": "bag",
+      "cell": [
+        3,
+        2
+      ],
+      "targets": []
+    }
+  ],
+  "metadata": {
+    "chapter": 1,
+    "hint": "",
+    "concept": "A punch moves a bag up to two cells while the boxer stays put.",
+    "solution": [
+      "P"
+    ]
+  }
+}

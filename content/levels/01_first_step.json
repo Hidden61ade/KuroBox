@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "id": "round_01",
+  "title": "FIRST STEP",
+  "width": 7,
+  "height": 6,
+  "floor": [
+    [
+      2,
+      1
+    ],
+    [
+      3,
+      1
+    ],
+    [
+      4,
+      1
+    ],
+    [
+      5,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      2
+    ],
+    [
+      4,
+      2
+    ],
+    [
+      5,
+      2
+    ],
+    [
+      1,
+      3
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      3
+    ],
+    [
+      5,
+      3
+    ],
+    [
+      1,
+      4
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "walls": [],
+  "goals": [
+    [
+      5,
+      2
+    ]
+  ],
+  "player": [
+    2,
+    2
+  ],
+  "facing": [
+    1,
+    0
+  ],
+  "objects": [
+    {
+      "id": "wood_01",
+      "type": "wood",
+      "cell": [
+        3,
+        2
+      ],
+      "targets": []
+    }
+  ],
+  "metadata": {
+    "chapter": 1,
+    "hint": "",
+    "concept": "Walk into a wood box to push it one cell.",
+    "solution": [
+      "R",
+      "R"
+    ]
+  }
+}

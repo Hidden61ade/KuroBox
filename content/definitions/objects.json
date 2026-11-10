@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "types": [
+    {
+      "id": "wood",
+      "label": "Wood box",
+      "editor_label": "木箱",
+      "behavior": "wood",
+      "sprite": "res://assets/sprites/boxing_crate.png",
+      "color": "#cb9663",
+      "pushable": true,
+      "punchable": false,
+      "punch_distance": 0
+    },
+    {
+      "id": "bag",
+      "label": "Punch bag",
+      "editor_label": "沙袋",
+      "behavior": "bag",
+      "sprite": "res://assets/sprites/boxing_bag.png",
+      "color": "#df746b",
+      "pushable": false,
+      "punchable": true,
+      "punch_distance": 2
+    },
+    {
+      "id": "plate",
+      "label": "Pressure plate",
+      "editor_label": "压板",
+      "behavior": "plate",
+      "sprite": "res://assets/sprites/sokoban_plate.png",
+      "color": "#dfbd70",
+      "pushable": false,
+      "punchable": false,
+      "punch_distance": 0
+    },
+    {
+      "id": "door",
+      "label": "Gate",
+      "editor_label": "门",
+      "behavior": "door",
+      "sprite": "res://assets/sprites/ref_door.png",
+      "sprite_open": "res://assets/sprites/ref_door_open.png",
+      "color": "#87b6a3",
+      "pushable": false,
+      "punchable": false,
+      "punch_distance": 0
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "width": 32,
+  "height": 32,
+  "color_mode": "rgb",
+  "frames": 10,
+  "durations_ms": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  "layers": [
+    {
+      "name": "Shadow",
+      "visible": true,
+      "opacity": 255,
+      "is_group": false,
+      "parent": null
+    },
+    {
+      "name": "Silhouette",
+      "visible": true,
+      "opacity": 255,
+      "is_group": false,
+      "parent": null
+    },
+    {
+      "name": "Features",
+      "visible": true,
+      "opacity": 255,
+      "is_group": false,
+      "parent": null
+    }
+  ],
+  "tags": [
+    {
+      "name": "objects",
+      "from": 1,
+      "to": 2,
+      "direction": "forward"
+    },
+    {
+      "name": "idle_directions",
+      "from": 3,
+      "to": 6,
+      "direction": "forward"
+    },
+    {
+      "name": "punch_directions",
+      "from": 7,
+      "to": 10,
+      "direction": "forward"
+    }
+  ],
+  "frame_names": [
+    {
+      "frame": 1,
+      "name": "boxing_crate"
+    },
+    {
+      "frame": 2,
+      "name": "boxing_bag"
+    },
+    {
+      "frame": 3,
+      "name": "boxing_player_down"
+    },
+    {
+      "frame": 4,
+      "name": "boxing_player_up"
+    },
+    {
+      "frame": 5,
+      "name": "boxing_player_right"
+    },
+    {
+      "frame": 6,
+      "name": "boxing_player_left"
+    },
+    {
+      "frame": 7,
+      "name": "boxing_player_punch_down"
+    },
+    {
+      "frame": 8,
+      "name": "boxing_player_punch_up"
+    },
+    {
+      "frame": 9,
+      "name": "boxing_player_punch_right"
+    },
+    {
+      "frame": 10,
+      "name": "boxing_player_punch_left"
+    }
+  ],
+  "authoring": "Aseprite MCP create_canvas / add_layer / add_frames / draw_pixels_at / export_frame / export_spritesheet / export_sprite",
+  "reference_usage": "User-provided reference features only; no stock-image crop, watermark removal, or PNG import."
+}

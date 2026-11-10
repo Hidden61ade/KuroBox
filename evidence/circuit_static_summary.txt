@@ -1,0 +1,62 @@
+res://.godot/exported/133200997/export-325ac2a482404db0f1c50883b7ab284d-menu.scn NODE ./back version=0 cells=480
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(2, 8): 42, (3, 8): 40, (4, 8): 36, (3, 9): 30, (2, 9): 28, (2, 10): 28, (2, 11): 28, (3, 10): 28, (3, 11): 28, (2, 12): 28, (3, 12): 28, (4, 9): 24, (4, 10): 24, (4, 11): 24, (4, 12): 24, (2, 13): 14, (3, 13): 14, (4, 13): 12})
+back y=0: (2, 8) (3, 8) (4, 8) (2, 8) (3, 8) (4, 8) (2, 8) (3, 8)
+back y=1: (2, 9) (3, 9) (4, 9) (2, 9) (3, 9) (4, 9) (2, 9) (3, 9)
+back y=2: (2, 10) (3, 10) (4, 10) (2, 10) (3, 10) (4, 10) (2, 10) (3, 10)
+back y=3: (2, 11) (3, 11) (4, 11) (2, 11) (3, 11) (4, 11) (2, 11) (3, 11)
+back y=4: (2, 12) (3, 12) (4, 12) (2, 12) (3, 12) (4, 12) (2, 12) (3, 12)
+back y=5: (2, 13) (3, 13) (4, 13) (2, 13) (3, 13) (4, 13) (2, 13) (3, 13)
+back y=6: (2, 8) (3, 8) (4, 8) (2, 8) (3, 8) (4, 8) (2, 8) (3, 8)
+back y=7: (2, 9) (3, 9) (4, 9) (2, 9) (3, 9) (4, 9) (2, 9) (3, 9)
+res://.godot/exported/133200997/export-325ac2a482404db0f1c50883b7ab284d-menu.scn NODE ./Node2D2/Node2D/plate version=0 cells=10
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(1, 1): 4, (2, 2): 1, (9, 1): 1, (11, 1): 1, (0, 3): 1, (0, 1): 1, (2, 3): 1})
+floor parity count=Counter()
+res://.godot/exported/133200997/export-325ac2a482404db0f1c50883b7ab284d-menu.scn NODE ./Node2D2/Node2D/plate2 version=0 cells=35
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(1, 1): 7, (5, 4): 4, (5, 5): 4, (5, 6): 4, (0, 1): 2, (2, 1): 2, (0, 3): 2, (2, 3): 2, (4, 4): 1, (4, 5): 1, (4, 6): 1, (6, 4): 1, (6, 5): 1, (6, 6): 1, (1, 0): 1, (2, 2): 1})
+res://.godot/exported/133200997/export-9a0bd6ebec2d54b6fde5cdb40ca63c84-level.scn NODE ./back version=0 cells=480
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(2, 8): 42, (3, 8): 40, (4, 8): 36, (3, 9): 30, (2, 9): 28, (2, 10): 28, (2, 11): 28, (3, 10): 28, (3, 11): 28, (2, 12): 28, (3, 12): 28, (4, 9): 24, (4, 10): 24, (4, 11): 24, (4, 12): 24, (2, 13): 14, (3, 13): 14, (4, 13): 12})
+back y=0: (2, 8) (3, 8) (4, 8) (2, 8) (3, 8) (4, 8) (2, 8) (3, 8)
+back y=1: (2, 9) (3, 9) (4, 9) (2, 9) (3, 9) (4, 9) (2, 9) (3, 9)
+back y=2: (2, 10) (3, 10) (4, 10) (2, 10) (3, 10) (4, 10) (2, 10) (3, 10)
+back y=3: (2, 11) (3, 11) (4, 11) (2, 11) (3, 11) (4, 11) (2, 11) (3, 11)
+back y=4: (2, 12) (3, 12) (4, 12) (2, 12) (3, 12) (4, 12) (2, 12) (3, 12)
+back y=5: (2, 13) (3, 13) (4, 13) (2, 13) (3, 13) (4, 13) (2, 13) (3, 13)
+back y=6: (2, 8) (3, 8) (4, 8) (2, 8) (3, 8) (4, 8) (2, 8) (3, 8)
+back y=7: (2, 9) (3, 9) (4, 9) (2, 9) (3, 9) (4, 9) (2, 9) (3, 9)
+res://.godot/exported/133200997/export-9a0bd6ebec2d54b6fde5cdb40ca63c84-level.scn NODE ./maps/plate version=0 cells=81
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(0, 4): 25, (1, 4): 24, (5, 6): 7, (4, 5): 7, (6, 5): 7, (5, 4): 7, (4, 6): 1, (6, 6): 1, (4, 4): 1, (6, 4): 1})
+floor parity count=Counter({(0, 0, 4): 25, (1, 1, 4): 24})
+res://.godot/exported/133200997/export-9a0bd6ebec2d54b6fde5cdb40ca63c84-level.scn NODE ./maps/range version=0 cells=24
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(1, 7): 5, (0, 6): 5, (2, 6): 5, (1, 5): 5, (0, 7): 1, (2, 7): 1, (0, 5): 1, (2, 5): 1})
+res://.godot/exported/133200997/export-9a0bd6ebec2d54b6fde5cdb40ca63c84-level.scn NODE ./data version=0 cells=240
+cell record: int16 x,y,source_id,atlas_x,atlas_y,alternative_id; atlas counts=Counter({(1, 8): 191, (0, 8): 49})
+TRANS black_to_fade length=0.46000000834465
+Node2D/ColorRect11:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect1:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect2:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect3:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect4:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect5:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect6:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect7:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect8:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect9:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+Node2D/ColorRect10:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}, {'time': 0.46000000834465, 'transition': 1.0, 'value': False}]
+TRANS fade_to_black length=0.46000000834465
+Node2D/ColorRect11:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect1:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect2:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect3:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect4:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect5:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect6:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect7:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect8:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect9:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+Node2D/ColorRect10:visible interpolation=1 keys=[{'time': 0.0, 'transition': 1.0, 'value': True}]
+TILE (0, 4): [((23, 109, 76, 255), 256)]
+TILE (1, 4): [((51, 92, 98, 255), 252), ((23, 109, 76, 255), 4)]
+TILE (2, 8): [((51, 57, 65, 255), 220), ((25, 70, 159, 255), 36)]
+TILE (3, 8): [((25, 70, 159, 255), 228), ((51, 57, 65, 255), 28)]
+TILE (4, 8): [((25, 70, 159, 255), 136), ((51, 57, 65, 255), 120)]
+Stripe source region: Asset/all.png Rect2(32,128,48,96); image exported without editing
