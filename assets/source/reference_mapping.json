@@ -158,7 +158,7 @@
   },
   {
     "output": "assets/ui/icon_undo.png",
-    "source": "assets/ui/circuit_Button_small6.png",
+    "source": "assets/ui/circuit_Button_small10.png",
     "rect": null,
     "flip_horizontal": false
   },
@@ -320,5 +320,17 @@
       ]
     },
     "note": "Duplicate the supplied volume-strip pixels; no new pixel artwork."
+  },
+  {
+    "output": "assets/ui/icon_undo_hover.png",
+    "source": "assets/ui/circuit_Button_small11.png",
+    "rect": null,
+    "flip_horizontal": false
+  },
+  {
+    "output": "assets/ui/icon_restart_hover.png",
+    "source": "assets/ui/circuit_Button_small7.png",
+    "rect": null,
+    "flip_horizontal": false
   }
 ]

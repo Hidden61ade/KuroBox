@@ -1,6 +1,6 @@
 # 验证范围
 
-本轮使用 Godot 4.6.stable.official.89cea1439。自动检查共337项通过：规则166、编辑器54、存档12、资源46、转场32、场景流程27。机器可读结果在 `evidence/validation_summary.json`。
+本轮使用 Godot 4.6.stable.official.89cea1439。自动检查共421项通过：规则166、编辑器54、存档12、资源49、转场32、场景流程27、底部HUD81。机器可读结果在 `evidence/validation_summary.json`。
 
 八关都用各自记录的命令在实际 BoardState 中通关，并检查完整撤销和重开。编辑器检查覆盖图层、合法叠放、框选复制和移动、连线、越界拒绝、导出往返和试关副本隔离。存档检查包含损坏主文件恢复、恢复后保存不破坏备份，以及旧版本程序不覆盖未知版本文件。
 
@@ -8,7 +8,9 @@
 
 Windows release使用官方4.6 x86_64模板导出。实际运行导出的exe，八关重放与工坊试玩隔离通过，退出日志无脚本或资源错误。二进制大小、SHA-256和release自检结果保存在验证摘要。模板取得方式、成员CRC检查与完整压缩包未下载的边界由下载工具记录。
 
-逐图检查确认主体、双色地格、目标和操作图标可辨，窗口缩小时工坊侧栏保持可滚动。按Godot视觉检查项记录：HIER-FOVEAL-CLEAR=2，HIER-PAUSE-SCRIM=2，TYPE-GLYPH-INTEGRITY=2，TYPE-DISPLAY-HUD-SPLIT=2，SPACE-RESP-COLLAPSE=2，ICON-SIL=1，COLOR-ONLY=2。撤销与重开的图形接近，仍依靠位置和悬浮提示区分。这里是对已查看画面的局部检查，不是全量视觉评分。
+逐图检查确认主体、双色地格、目标和操作图标可辨，窗口缩小时工坊侧栏保持可滚动。按Godot视觉检查项记录：HIER-FOVEAL-CLEAR=2，HIER-PAUSE-SCRIM=2，TYPE-GLYPH-INTEGRITY=2，TYPE-DISPLAY-HUD-SPLIT=2，SPACE-RESP-COLLAPSE=2，ICON-SIL=2，COLOR-ONLY=2。撤销与重开分别采用原包各自的图标和悬停态，按钮下方使用原像素字体配黑色键帽。这里是对已查看画面的局部检查，不是全量视觉评分。
+
+底部HUD额外检查了Z/R/Space/F11/M/Q真实按键与按钮的行为一致性、暂停时不操作背后、静音状态同步、返回工坊保留文档，以及重复进出不累积信号连接。1280×720和960×640下，所有键帽均位于对应按钮下方、画面边界以内；实际渲染图另存 `evidence/hud_footer_game.webp` 和 `hud_footer_detail.webp`。
 
 信号静态扫描没有发现旧式字符串信号连接；扫描器提示了局部匿名回调。已检查这些回调的源控件与编辑器共同销毁，不把单纯命中匿名函数当成已证实泄漏；实际场景和发布程序退出日志另外检查资源清理。
 

@@ -8,8 +8,19 @@
 - `circuit_quit_normal/hover.png`、`icon_exit.png`、`icon_quit.png`、`icon_back.png`：原 `Button_small2/3`，16×16，门和向外箭头。项目用于退出当前页、回到上层；不要同时把相同图案放成两个不同动作。
 - `circuit_music_normal/hover.png`、`icon_volume.png`、`icon_music.png`：原 `Button_small4/5`，16×16，喇叭。
 - `circuit_screen_normal/hover.png`、`icon_fullscreen.png`：原 `Button_small8/9`，16×16，屏幕与四角。
-- `icon_restart.png`、`icon_undo.png`：原 `Button_small6`，16×16，回转箭头。当前是同一图片的两个语义别名；同屏同时提供时，应以位置或悬停名称区分。
+- `icon_undo.png`：原 `Button_small10`；`icon_undo_hover.png`：原 `Button_small11`，均为 16×16。原 `level.scn` 的 `./UI/before` 使用这组回退箭头，对应 Z。pressed 使用 normal 图。
+- `icon_restart.png`：原 `Button_small6`；`icon_restart_hover.png`：原 `Button_small7`，均为 16×16。原 `./UI/replay` 使用这组圆形重来箭头，对应 R。pressed 使用 normal 图。
 - `icon_play.png`、`icon_next.png`：原开始按钮 normal 的别名，26×20，红色圆形内有播放箭头。
+
+## 原底部快捷键
+
+核对来源为 `evidence/circuit_static_resources.json` 中的原 `level.scn`，只读取静态场景资源。底部从左到右为 before、replay、screen、music、quit；在原 320×180 视口中的左上角分别为 `(88,156)`、`(104,156)`、`(168,156)`、`(184,156)`、`(200,156)`，按钮均为 16×16。
+
+Z、R、Q 并非画在键位 PNG 中。三个 Sprite2D 都用 `key.png` 作底，位置分别为 `(95,175)`、`(111,175)`、`(208,175)`；各自子 Label 文本为 Z、R、Q，局部 scale 为 `(0.5,0.5)`，offset 为 left/top `-4`、right/bottom `14`，水平与垂直均居中。原 Shortcut 的 keycode 分别为 90、82、81。
+
+全局 `gui/theme/custom_font` 是 `uid://gnxotfiyv8js`，与原包 `Awesome 9.ttf.import` 的 UID 一致，指向 Awesome 9 字体。项目已导出为 `assets/ui/circuit_awesome9.ttf`。原 Label 没有独立字号覆盖，Godot 4.6 默认 Label 字号实测为 16；复现时可保留 16 号再缩半的处理。
+
+`circuit_key.png` 和 `circuit_key1.png` 是 16×16 画布中央的 6×6 黑底，没有字母；`circuit_key2.png` 只额外包含 6 个白像素，是空格样式，也不含 Z/R/Q。
 
 ## Sprout 与 ASSET 符号
 

@@ -21,13 +21,17 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	app.profile = ProfileStore.new("user://flow_test_profile.json")
+	app._apply_settings()
+	await process_frame
 	_check(app.campaign.size() == 8, "eight campaign levels loaded by shell")
 	_check(app.current_screen == "menu", "initial menu")
 	await _shot("menu")
 	var start_button := app.find_child("StartButton", true, false) as BaseButton
 	_check(start_button != null, "start button is present")
 	start_button.pressed.emit()
-	await create_timer(1.0).timeout
+	if app._transition.busy:
+		await app._transition.finished
+	await process_frame
 	_check(app.current_screen == "play" and app.current_index == 0, "start signal opens first uncompleted level")
 	_check(app.board.moves == 0, "fresh board")
 	var initial: Dictionary = app.board.snapshot()

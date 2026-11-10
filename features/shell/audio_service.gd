@@ -3,6 +3,7 @@ extends Node
 
 var volume: float = 0.65
 var music_volume: float = 0.35
+var muted: bool = false
 var _voices: Array[AudioStreamPlayer] = []
 var _streams: Dictionary = {}
 var _music: AudioStreamPlayer
@@ -30,6 +31,10 @@ func set_levels(sound_level: float, music_level: float) -> void:
 	music_volume = clampf(music_level, 0.0, 1.0)
 	if is_instance_valid(_music):
 		_music.volume_db = linear_to_db(maxf(music_volume, 0.0001))
+
+func set_muted(enabled: bool) -> void:
+	muted = enabled
+	AudioServer.set_bus_mute(AudioServer.get_bus_index(&"Master"), muted)
 
 func play_event(event: String) -> void:
 	if volume <= 0.0 or not _streams.has(event):

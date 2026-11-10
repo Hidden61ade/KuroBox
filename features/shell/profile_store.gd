@@ -4,7 +4,7 @@ extends RefCounted
 const SAVE_PATH := "user://profile.json"
 var save_path: String = SAVE_PATH
 var completed: Dictionary = {}
-var settings: Dictionary = {"sound": 0.65, "music": 0.35, "shake": true, "fullscreen": false}
+var settings: Dictionary = {"sound": 0.65, "music": 0.35, "shake": true, "fullscreen": false, "muted": false}
 var last_error: String = ""
 var _blocked_version: bool = false
 

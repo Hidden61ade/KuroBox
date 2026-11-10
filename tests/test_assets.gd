@@ -28,6 +28,11 @@ func _run() -> void:
 		_texture("res://assets/ui/icon_" + key + ".png")
 	for state: String in ["normal", "hover", "pressed"]:
 		_texture("res://assets/ui/circuit_start_" + state + ".png")
+	_texture("res://assets/ui/icon_undo_hover.png")
+	_texture("res://assets/ui/icon_restart_hover.png")
+	var undo_icon: Texture2D = load("res://assets/ui/icon_undo.png")
+	var restart_icon: Texture2D = load("res://assets/ui/icon_restart.png")
+	_check(undo_icon.get_image().get_data() != restart_icon.get_image().get_data(), "undo and restart use their distinct original symbols")
 	var even := _texture("res://assets/ui/floor_even.png").get_image()
 	_texture("res://assets/sprites/sokoban_goal.png")
 	var odd := _texture("res://assets/ui/floor_odd.png").get_image()

@@ -108,7 +108,44 @@ static func icon_button(key: String, hint: String, callback: Callable, extent: i
 		node.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	node.add_theme_stylebox_override("focus", outline(Color("ffd541")))
 	node.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	node.mouse_entered.connect(func() -> void: node.self_modulate = Color(1.2, 1.2, 1.2))
-	node.mouse_exited.connect(func() -> void: node.self_modulate = Color.WHITE)
+	var normal_texture := node.icon
+	var hover_path := "res://assets/ui/icon_" + key + "_hover.png"
+	var reference_hover := {"back":"circuit_quit_hover", "quit":"circuit_quit_hover", "fullscreen":"circuit_screen_hover", "volume":"circuit_music_hover", "music":"circuit_music_hover"}
+	if not ResourceLoader.exists(hover_path) and reference_hover.has(key):
+		hover_path = "res://assets/ui/" + str(reference_hover[key]) + ".png"
+	var hover_texture: Texture2D = load(hover_path) if ResourceLoader.exists(hover_path) else null
+	node.mouse_entered.connect(func() -> void:
+		if hover_texture != null:
+			node.icon = hover_texture
+		else:
+			node.self_modulate = Color(1.2, 1.2, 1.2))
+	node.mouse_exited.connect(func() -> void:
+		node.icon = normal_texture
+		node.self_modulate = Color.WHITE)
 	node.pressed.connect(callback)
 	return node
+
+static func key_hint(text: String) -> Control:
+	var container := Control.new()
+	container.custom_minimum_size = Vector2(48, 24)
+	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var cap := TextureRect.new()
+	var crop := AtlasTexture.new()
+	crop.atlas = preload("res://assets/ui/circuit_key.png")
+	crop.region = Rect2(5, 5, 6, 6)
+	crop.filter_clip = true
+	cap.texture = crop
+	cap.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	cap.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cap.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	var width := 24.0 if text.length() == 1 else 32.0 if text.length() == 3 else 64.0
+	cap.position = Vector2(-width * 0.5, -12)
+	cap.size = Vector2(width, 24)
+	container.add_child(cap)
+	var glyph := pixel_label(text, 24 if text.length() == 1 else 18, Color.WHITE)
+	glyph.name = "Glyph"
+	glyph.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	glyph.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	container.add_child(glyph)
+	return container

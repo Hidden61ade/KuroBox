@@ -7,6 +7,7 @@ const View = preload("res://features/play/board_view.gd")
 const Editor = preload("res://features/editor/level_editor.gd")
 const Backdrop = preload("res://features/shell/scrolling_backdrop.gd")
 const Transition = preload("res://features/shell/stripe_transition.gd")
+const Footer = preload("res://features/play/hud_footer.gd")
 
 var profile: ProfileStore
 var audio: AudioService
@@ -28,6 +29,7 @@ var _generation: int = 0
 var _notice_label: Label
 var _import_dialog: FileDialog
 var _transition: StripeTransition
+var _hud_footer: HudFooter
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
@@ -84,6 +86,7 @@ func _clear_content() -> void:
 			_content.remove_child(child)
 			child.queue_free()
 	board_view = null
+	_hud_footer = null
 	_actions_label = null
 
 func _screen_margin(padding: int = 36) -> MarginContainer:
@@ -139,8 +142,8 @@ func show_menu() -> void:
 	lower.alignment = BoxContainer.ALIGNMENT_CENTER
 	lower.add_theme_constant_override("separation", 8)
 	column.add_child(lower)
-	lower.add_child(_icon("fullscreen", "设置", show_settings, 48))
-	lower.add_child(_icon("music", "音乐开关", _toggle_music, 48))
+	lower.add_child(_icon("fullscreen", "全屏 · F11", _toggle_fullscreen, 48))
+	lower.add_child(_icon("music", "声音开关 · M", _toggle_sound, 48))
 	lower.add_child(_icon("quit", "退出", request_quit, 48))
 	play.grab_focus()
 	var corner := HBoxContainer.new()
@@ -148,6 +151,7 @@ func show_menu() -> void:
 	corner.position = Vector2(24, -72)
 	_content.add_child(corner)
 	corner.add_child(_icon("info", "制作与来源", show_credits, 40))
+	corner.add_child(_icon("settings", "设置", show_settings, 40))
 
 func _icon(key: String, hint: String, callback: Callable, extent: int = 64, navigate: bool = false) -> Button:
 	return Kit.icon_button(key, hint, func() -> void:
@@ -161,9 +165,15 @@ func _navigate(callback: Callable) -> void:
 	if _transition != null and not _transition.busy:
 		_transition.play(callback)
 
-func _toggle_music() -> void:
-	profile.settings.music = 0.35 if float(profile.settings.music) <= 0.0 else 0.0
-	audio.set_levels(float(profile.settings.sound), float(profile.settings.music))
+func _toggle_sound() -> void:
+	profile.settings.muted = not bool(profile.settings.muted)
+	_apply_settings()
+	if profile.write() != OK:
+		show_message("设置未保存", profile.last_error)
+
+func _toggle_fullscreen() -> void:
+	profile.settings.fullscreen = not bool(profile.settings.fullscreen)
+	_apply_settings()
 	if profile.write() != OK:
 		show_message("设置未保存", profile.last_error)
 
@@ -230,9 +240,9 @@ func start_level(level: Dictionary, index: int = -1, is_editor_test: bool = fals
 	margin.add_child(column)
 	var header := HBoxContainer.new()
 	column.add_child(header)
-	var back := _icon("back", "返回工坊" if testing_editor else "选择关卡", _leave_play, 52, true)
-	back.focus_mode = Control.FOCUS_NONE
-	header.add_child(back)
+	var balance := Control.new()
+	balance.custom_minimum_size.x = 52
+	header.add_child(balance)
 	var title := Kit.pixel_label("%02d" % (index + 1) if index >= 0 else "*", 44)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
@@ -247,27 +257,43 @@ func start_level(level: Dictionary, index: int = -1, is_editor_test: bool = fals
 	column.add_child(board_view)
 	board_view.set_board(board)
 	board_view.grab_focus()
-	var footer := HBoxContainer.new()
-	column.add_child(footer)
-	var undo := _icon("undo", "撤销 · Z", undo_action, 48)
-	undo.focus_mode = Control.FOCUS_NONE
-	footer.add_child(undo)
-	var restart := _icon("restart", "重来 · R", restart_level, 48)
-	restart.focus_mode = Control.FOCUS_NONE
-	footer.add_child(restart)
-	var hint := Kit.pixel_label("", 20, Kit.MUTED)
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if index in [0, 1]:
-		hint.text = "W A S D"
-	elif index in [2, 3]:
-		hint.text = "SPACE"
-	footer.add_child(hint)
-	var punch := _icon("punch", "出拳 · Space", punch_action, 48)
-	punch.focus_mode = Control.FOCUS_NONE
-	footer.add_child(punch)
+		var hint := Kit.pixel_label("W A S D", 18, Kit.MUTED)
+		hint.custom_minimum_size.y = 20
+		column.add_child(hint)
+	var footer_center := CenterContainer.new()
+	column.add_child(footer_center)
+	_hud_footer = Footer.new()
+	_hud_footer.name = "HudFooter"
+	footer_center.add_child(_hud_footer)
+	_hud_footer.action_requested.connect(_on_hud_action)
+	board_view.resized.connect(_resize_hud_footer)
+	_resize_hud_footer.call_deferred()
+	_sync_hud_options()
 	_actions_label = null
 	if board.is_won():
 		show_completion.call_deferred()
+
+func _resize_hud_footer() -> void:
+	if not is_instance_valid(_hud_footer) or not is_instance_valid(board_view) or board == null:
+		return
+	var board_width := float(board.level.width) * board_view.cell_size
+	_hud_footer.custom_minimum_size.x = clampf(board_width, 400.0, maxf(400.0, board_view.size.x - 48.0))
+
+func _sync_hud_options() -> void:
+	if is_instance_valid(_hud_footer):
+		_hud_footer.sync_options(bool(profile.settings.fullscreen), bool(profile.settings.muted))
+
+func _on_hud_action(action: StringName) -> void:
+	if current_screen != "play" or _modal != null or _transition.busy or _quitting:
+		return
+	match action:
+		&"undo": undo_action()
+		&"restart": restart_level()
+		&"punch": punch_action()
+		&"fullscreen": _toggle_fullscreen()
+		&"sound": _toggle_sound()
+		&"back": _navigate(_leave_play)
 
 func _update_hud() -> void:
 	if is_instance_valid(_actions_label) and board != null:
@@ -277,12 +303,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed:
 		return
 	var key: int = event.physical_keycode if event.physical_keycode != 0 else event.keycode
-	if event.echo and key in [KEY_F11, KEY_ESCAPE, KEY_R, KEY_Z, KEY_SPACE]:
+	if event.echo and key in [KEY_F11, KEY_ESCAPE, KEY_R, KEY_Z, KEY_SPACE, KEY_M, KEY_Q]:
 		return
 	if key == KEY_F11:
-		profile.settings.fullscreen = not bool(profile.settings.fullscreen)
-		_apply_settings()
-		profile.write()
+		_toggle_fullscreen()
+		get_viewport().set_input_as_handled()
+		return
+	if key == KEY_M and current_screen in ["menu", "select", "play"] and _modal == null:
+		_toggle_sound()
 		get_viewport().set_input_as_handled()
 		return
 	if key == KEY_ESCAPE:
@@ -311,6 +339,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_SPACE: punch_action()
 		KEY_Z: undo_action()
 		KEY_R: restart_level()
+		KEY_Q: _on_hud_action(&"back")
 		_: return
 	get_viewport().set_input_as_handled()
 
@@ -507,6 +536,8 @@ func _apply_settings() -> void:
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if bool(profile.settings.fullscreen) else DisplayServer.WINDOW_MODE_WINDOWED)
 	if audio != null:
 		audio.set_levels(float(profile.settings.sound), float(profile.settings.music))
+		audio.set_muted(bool(profile.settings.muted))
+	_sync_hud_options()
 
 func show_credits() -> void:
 	var column := _modal_column(620)

@@ -5,11 +5,12 @@
     "core": 166,
     "editor": 54,
     "profile": 12,
-    "assets": 46,
+    "assets": 49,
     "transition": 32,
-    "flow": 27
+    "flow": 27,
+    "hud_footer": 81
   },
-  "total_checks": 337,
+  "total_checks": 421,
   "failures": [],
   "campaign": [
     {
@@ -112,8 +113,8 @@
   ],
   "windows_release": {
     "path": "builds/windows/KuroBox.exe",
-    "bytes": 104913048,
-    "sha256": "fbaf41ba160b3acad45989c5b541545e4d0f143482857ec904863df3d2c5de72",
+    "bytes": 104920544,
+    "sha256": "735b359f08c4f5bb297683860f03e6d9c9e857a6e6581e29769713144d3d55ba",
     "self_check": {
       "editor_preserved": true,
       "engine": "4.6-stable (official)",
@@ -131,5 +132,229 @@
     "cover_seconds": 0.46,
     "reveal_seconds": 0.46,
     "source": "Static resources from supplied Circuit Delay publication; no original game execution used to derive animation parameters."
+  },
+  "hud_footer": {
+    "shortcuts": {
+      "undo": "Z",
+      "restart": "R",
+      "punch": "SPACE",
+      "fullscreen": "F11",
+      "sound": "M",
+      "back": "Q"
+    },
+    "reference": "Original Circuit Delay before/replay/utility icons, key.png and Awesome 9 font",
+    "checks": 81,
+    "failures": [],
+    "layouts": [
+      {
+        "footer": [
+          384.0,
+          616.0,
+          512.0,
+          80.0
+        ],
+        "labels": [
+          {
+            "action": "undo",
+            "button": [
+              386.0,
+              616.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              384.0,
+              666.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "restart",
+            "button": [
+              442.0,
+              616.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              440.0,
+              666.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "punch",
+            "button": [
+              615.0,
+              616.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              603.0,
+              666.0,
+              72.0,
+              24.0
+            ]
+          },
+          {
+            "action": "fullscreen",
+            "button": [
+              734.0,
+              616.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              732.0,
+              666.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "sound",
+            "button": [
+              790.0,
+              616.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              788.0,
+              666.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "back",
+            "button": [
+              846.0,
+              616.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              844.0,
+              666.0,
+              52.0,
+              24.0
+            ]
+          }
+        ],
+        "viewport": [
+          1280,
+          720
+        ]
+      },
+      {
+        "footer": [
+          224.0,
+          536.0,
+          512.0,
+          80.0
+        ],
+        "labels": [
+          {
+            "action": "undo",
+            "button": [
+              226.0,
+              536.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              224.0,
+              586.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "restart",
+            "button": [
+              282.0,
+              536.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              280.0,
+              586.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "punch",
+            "button": [
+              455.0,
+              536.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              443.0,
+              586.0,
+              72.0,
+              24.0
+            ]
+          },
+          {
+            "action": "fullscreen",
+            "button": [
+              574.0,
+              536.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              572.0,
+              586.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "sound",
+            "button": [
+              630.0,
+              536.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              628.0,
+              586.0,
+              52.0,
+              24.0
+            ]
+          },
+          {
+            "action": "back",
+            "button": [
+              686.0,
+              536.0,
+              48.0,
+              48.0
+            ],
+            "hint": [
+              684.0,
+              586.0,
+              52.0,
+              24.0
+            ]
+          }
+        ],
+        "viewport": [
+          960,
+          640
+        ]
+      }
+    ],
+    "native_capture": "evidence/hud_footer_detail.webp"
   }
 }
