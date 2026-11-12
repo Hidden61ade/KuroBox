@@ -228,49 +228,21 @@
   },
   {
     "output": "assets/ui/icon_punch.png",
-    "source": "assets/sprites/boxing_player_punch_up.png",
-    "rect": [
-      21,
-      0,
-      9,
-      7
-    ],
+    "source": "assets/source/kurobox_punch_icon.aseprite",
+    "rect": null,
     "composition": {
       "canvas": [
         16,
         16
       ],
-      "parts": [
-        {
-          "source": "assets/sprites/boxing_player_punch_up.png",
-          "rect": [
-            21,
-            0,
-            9,
-            7
-          ],
-          "position": [
-            3,
-            3
-          ]
-        },
-        {
-          "source": "assets/sprites/boxing_player_down.png",
-          "rect": [
-            7,
-            22,
-            2,
-            2
-          ],
-          "position": [
-            7,
-            10
-          ]
-        }
+      "layers": [
+        "Glove",
+        "Cuff",
+        "Motion Arrow"
       ]
     },
     "aseprite_source": "assets/source/kurobox_punch_icon.aseprite",
-    "note": "Existing pixels cropped and composed via Aseprite MCP; no new pixel drawing."
+    "note": "Drawn in Aseprite with a short left wrist cuff, red knuckles facing right, a lower thumb contour, and a cream rightward arrow. Exported as PNG."
   },
   {
     "output": "assets/ui/icon_import.png",

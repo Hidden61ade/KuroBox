@@ -9,6 +9,7 @@ var played: Array[Dictionary] = []
 var capture := false
 var _profile_path := ""
 var _finished := false
+var _camera_smoothed := false
 
 func _initialize() -> void:
 	call_deferred("_run")
@@ -47,6 +48,8 @@ func _run() -> void:
 		app.start_level(level, index)
 		await _frames(3)
 		var initial: Dictionary = app.board.snapshot()
+		var initial_origin: Vector2 = app.board_view.board_origin
+		_camera_smoothed = false
 		_check_layout(str(level.id), Vector2i(1280, 720))
 		if index in [4, 6, 7] or index >= 8:
 			await _shot("campaign_%02d_start" % (index + 1))
@@ -54,12 +57,19 @@ func _run() -> void:
 		var closed_seen := false
 		var transfer_seen := false
 		var opened_seen := _any_gate_open()
+		var player_visible := true
+		var follow_captured := false
 		for raw: Variant in level.get("metadata", {}).get("solution", []):
 			var command := str(raw)
 			if index == 4 and not brake_seen and command == "P" and _wood_brakes_next_punch():
 				await _shot("campaign_05_mobile_brake")
 				brake_seen = true
 			await _command(command)
+			var view: BoardView = app.board_view
+			player_visible = player_visible and Rect2(Vector2.ZERO, view.size).encloses(view.cell_to_rect(app.board.player))
+			if index == app.campaign.size() - 1 and not follow_captured and view.board_origin.distance_to(initial_origin) >= 64.0 and not app.board.is_won():
+				await _shot("campaign_final_follow")
+				follow_captured = true
 			if index == 6 and opened_seen and not closed_seen and _all_gates_unpowered_closed():
 				await _shot("campaign_07_released_gate")
 				closed_seen = true
@@ -68,8 +78,11 @@ func _run() -> void:
 				transfer_seen = true
 			opened_seen = opened_seen or _any_gate_open()
 		_check(app.board.is_won(), "%s wins via real keyboard input through the shell" % level.id)
+		_check(player_visible, "%s keeps the player visible through its solution" % level.id)
+		if index >= 8:
+			_check(_camera_smoothed, "%s pans through intermediate camera positions during a move" % level.id)
 		_check(app._modal_kind == "completion", "%s creates its completion menu after the final animation" % level.id)
-		played.append({"id":level.id, "commands":level.metadata.solution.size(), "moves":app.board.moves, "punches":app.board.punches, "won":app.board.is_won(), "viewport":[1280,720]})
+		played.append({"id":level.id, "commands":level.metadata.solution.size(), "moves":app.board.moves, "punches":app.board.punches, "won":app.board.is_won(), "viewport":[1280,720], "cell_pixels":app.board_view.cell_size, "smooth_camera_observed":_camera_smoothed})
 		if index == 4:
 			_check(brake_seen, "round_05 replay actually uses a wood box to stop the next punch")
 		if index == 6:
@@ -80,6 +93,7 @@ func _run() -> void:
 		_check(not app.board.is_won(), "%s final action is reversible from completion" % level.id)
 		app.restart_level()
 		_check(app.board.snapshot() == initial, "%s restart restores all initial devices and pieces" % level.id)
+		_check(app.board_view.board_origin == initial_origin, "%s restart restores its starting framing" % level.id)
 	root.size = Vector2i(960, 640)
 	root.content_scale_size = Vector2i(960, 640)
 	await _frames(3)
@@ -93,14 +107,19 @@ func _run() -> void:
 
 func _check_layout(id: String, viewport: Vector2i) -> void:
 	var view: Control = app.board_view
-	var fits := true
+	var floor_bounds := Rect2()
 	for raw: Array in app.board.level.floor:
 		var rect: Rect2 = view.cell_to_rect(Vector2i(raw[0], raw[1]))
-		fits = fits and rect.position.x >= 0.0 and rect.position.y >= 0.0 and rect.end.x <= view.size.x and rect.end.y <= view.size.y
-	_check(fits, "%s complete playable floor fits %s without clipping" % [id, viewport])
+		floor_bounds = floor_bounds.merge(rect) if floor_bounds.has_area() else rect
+	var frame := floor_bounds.grow(BoardView.Rim.PADDING_TILES * view.cell_size)
+	var visible := Rect2(Vector2.ZERO, view.size)
+	if frame.size.x <= view.size.x and frame.size.y <= view.size.y:
+		_check(visible.grow(1.0).encloses(frame), "%s centers the full frame when it fits %s" % [id, viewport])
+	else:
+		_check(visible.encloses(view.cell_to_rect(app.board.player)), "%s frames the player at %s" % [id, viewport])
 	var footer: Rect2 = app._hud_footer.get_global_rect()
 	_check(Rect2(Vector2.ZERO, Vector2(viewport)).encloses(footer), "%s footer fits %s" % [id, viewport])
-	_check(view.cell_size >= 16.0, "%s keeps at least native ground pixel scale at %s" % [id, viewport])
+	_check(is_equal_approx(view.cell_size, BoardView.PLAY_CELL_SIZE), "%s keeps fixed play scale at %s" % [id, viewport])
 
 func _wood_brakes_next_punch() -> bool:
 	var board: BoardState = app.board
@@ -150,6 +169,8 @@ func _bag_powers_gate_without_wood() -> bool:
 	return false
 
 func _command(command: String) -> void:
+	var last_origin: Vector2 = app.board_view.board_origin
+	var camera_changes := 0
 	var key: Key = {"U":KEY_UP,"D":KEY_DOWN,"L":KEY_LEFT,"R":KEY_RIGHT,"P":KEY_SPACE}[command]
 	var event := InputEventKey.new()
 	event.keycode = key
@@ -165,6 +186,10 @@ func _command(command: String) -> void:
 	var deadline := Time.get_ticks_msec() + 3000
 	while app._busy and Time.get_ticks_msec() < deadline:
 		await process_frame
+		if app.board_view.board_origin != last_origin:
+			camera_changes += 1
+			last_origin = app.board_view.board_origin
+	_camera_smoothed = _camera_smoothed or camera_changes > 1
 	_check(not app._busy, "animation command settles within its runtime budget")
 	await process_frame
 

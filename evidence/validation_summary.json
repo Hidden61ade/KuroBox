@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-10",
+  "date": "2026-11-12",
   "engine": "4.6.stable.official.89cea1439",
   "automated_checks": {
     "core": 187,
@@ -7,7 +7,7 @@
     "replay": 44,
     "workspace": 102,
     "editor": 54,
-    "editor_workbench": 54,
+    "editor_workbench": 55,
     "recovery": 20,
     "profile": 12,
     "assets": 50,
@@ -18,9 +18,9 @@
     "advanced_levels": 60,
     "rapid_input": 39,
     "native_editor": 46,
-    "campaign_playthrough": 426
+    "campaign_playthrough": 452
   },
-  "total_checks": 1363,
+  "total_checks": 1390,
   "failures": [],
   "campaign": [
     {
@@ -144,8 +144,8 @@
   ],
   "windows_release": {
     "path": "builds/windows/KuroBox.exe",
-    "bytes": 104981136,
-    "sha256": "7eb124c7f00a44b845bd247da7bfb1a60e3ebd4e817f2dea3fff87ace77e4eed",
+    "bytes": 104986424,
+    "sha256": "7b36dc823b959ebeae06c2d83cd08b9ab5966c6cc08a6930d35fcd21d64676a1",
     "self_check": {
       "editor_preserved": true,
       "engine": "4.6-stable (official)",
@@ -422,7 +422,7 @@
         "counterfactual": {
           "exhausted": true,
           "limited": false,
-          "states": 34206,
+          "states": 19601,
           "won": false
         },
         "moves": 12,
@@ -446,7 +446,7 @@
         "counterfactual": {
           "exhausted": true,
           "limited": false,
-          "states": 3597,
+          "states": 1950,
           "won": false
         },
         "handoff_command_index": 10,
@@ -695,7 +695,7 @@
     "repeat_waiting_limit": 1
   },
   "campaign_playthrough": {
-    "checks": 426,
+    "checks": 452,
     "display_driver": "Windows",
     "engine": "4.6-stable (official)",
     "failures": [],
@@ -703,10 +703,12 @@
     "isolated_profile": true,
     "published_campaign": [
       {
+        "cell_pixels": 64.0,
         "commands": 2,
         "id": "round_01",
         "moves": 2,
         "punches": 0,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -714,10 +716,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 6,
         "id": "round_02",
         "moves": 6,
         "punches": 0,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -725,10 +729,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 1,
         "id": "round_03",
         "moves": 1,
         "punches": 1,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -736,10 +742,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 4,
         "id": "round_04",
         "moves": 3,
         "punches": 1,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -747,10 +755,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 13,
         "id": "round_05",
         "moves": 12,
         "punches": 1,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -758,10 +768,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 5,
         "id": "round_06",
         "moves": 4,
         "punches": 1,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -769,10 +781,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 10,
         "id": "round_07",
         "moves": 9,
         "punches": 2,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -780,10 +794,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 15,
         "id": "round_08",
         "moves": 15,
         "punches": 2,
+        "smooth_camera_observed": false,
         "viewport": [
           1280,
           720
@@ -791,10 +807,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 44,
         "id": "round_09",
         "moves": 43,
         "punches": 3,
+        "smooth_camera_observed": true,
         "viewport": [
           1280,
           720
@@ -802,10 +820,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 83,
         "id": "round_10",
         "moves": 77,
         "punches": 10,
+        "smooth_camera_observed": true,
         "viewport": [
           1280,
           720
@@ -813,10 +833,12 @@
         "won": true
       },
       {
+        "cell_pixels": 64.0,
         "commands": 117,
         "id": "round_11",
         "moves": 110,
         "punches": 14,
+        "smooth_camera_observed": true,
         "viewport": [
           1280,
           720
@@ -835,6 +857,7 @@
       "res://evidence/campaign_09_start.webp",
       "res://evidence/campaign_10_start.webp",
       "res://evidence/campaign_11_start.webp",
+      "res://evidence/campaign_final_follow.webp",
       "res://evidence/campaign_final_960.webp"
     ]
   }

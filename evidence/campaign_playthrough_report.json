@@ -1,5 +1,5 @@
 {
-	"checks": 426,
+	"checks": 452,
 	"display_driver": "Windows",
 	"engine": "4.6-stable (official)",
 	"failures": [],
@@ -7,10 +7,12 @@
 	"isolated_profile": true,
 	"published_campaign": [
 		{
+			"cell_pixels": 64.0,
 			"commands": 2,
 			"id": "round_01",
 			"moves": 2,
 			"punches": 0,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -18,10 +20,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 6,
 			"id": "round_02",
 			"moves": 6,
 			"punches": 0,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -29,10 +33,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 1,
 			"id": "round_03",
 			"moves": 1,
 			"punches": 1,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -40,10 +46,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 4,
 			"id": "round_04",
 			"moves": 3,
 			"punches": 1,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -51,10 +59,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 13,
 			"id": "round_05",
 			"moves": 12,
 			"punches": 1,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -62,10 +72,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 5,
 			"id": "round_06",
 			"moves": 4,
 			"punches": 1,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -73,10 +85,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 10,
 			"id": "round_07",
 			"moves": 9,
 			"punches": 2,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -84,10 +98,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 15,
 			"id": "round_08",
 			"moves": 15,
 			"punches": 2,
+			"smooth_camera_observed": false,
 			"viewport": [
 				1280,
 				720
@@ -95,10 +111,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 44,
 			"id": "round_09",
 			"moves": 43,
 			"punches": 3,
+			"smooth_camera_observed": true,
 			"viewport": [
 				1280,
 				720
@@ -106,10 +124,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 83,
 			"id": "round_10",
 			"moves": 77,
 			"punches": 10,
+			"smooth_camera_observed": true,
 			"viewport": [
 				1280,
 				720
@@ -117,10 +137,12 @@
 			"won": true
 		},
 		{
+			"cell_pixels": 64.0,
 			"commands": 117,
 			"id": "round_11",
 			"moves": 110,
 			"punches": 14,
+			"smooth_camera_observed": true,
 			"viewport": [
 				1280,
 				720
@@ -139,6 +161,7 @@
 		"res://evidence/campaign_09_start.webp",
 		"res://evidence/campaign_10_start.webp",
 		"res://evidence/campaign_11_start.webp",
+		"res://evidence/campaign_final_follow.webp",
 		"res://evidence/campaign_final_960.webp"
 	]
 }

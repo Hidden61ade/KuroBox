@@ -289,7 +289,7 @@ func resume_after_test() -> void:
 	# Deliberately do not reload or replace the authored document / selection.
 	if _built:
 		_status.text = ""
-		_board.queue_redraw()
+		_board.refresh_drawing()
 		_overlay.queue_redraw()
 	var no_debug: Array[Dictionary] = []
 	test_state_changed.emit(no_debug, {"active": false, "commands": _test_commands.duplicate(), "proof_valid": not get_last_proof().is_empty()})

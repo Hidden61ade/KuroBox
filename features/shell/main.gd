@@ -255,6 +255,7 @@ func start_level(level: Dictionary, index: int = -1, is_editor_test: bool = fals
 	header.add_child(pause)
 	board_view = View.new()
 	board_view.name = "BoardView"
+	board_view.use_play_camera = true
 	board_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	board_view.shake_enabled = bool(profile.settings.shake)
 	column.add_child(board_view)
@@ -439,7 +440,7 @@ func restart_level() -> void:
 	_close_modal()
 	_cancel_pending_commands()
 	board.restart()
-	board_view.stop_animation()
+	board_view.set_board(board)
 	_update_hud()
 	board_view.grab_focus()
 	audio.play_event("ui_back")

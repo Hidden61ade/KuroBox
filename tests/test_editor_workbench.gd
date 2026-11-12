@@ -119,6 +119,14 @@ func _run() -> void:
 	_check(view.get_view_state() == held_view, "external undo restoration preserves the navigation state")
 	var restored_cell := Vector2i(4, 4)
 	_check(view.screen_to_cell(view.cell_to_rect(restored_cell).get_center()) == restored_cell, "overlay rectangles and hit testing share the same view transform")
+	var dragged_cells: Array[Vector2i] = []
+	view.cell_dragged.connect(func(cell: Vector2i, _button: int) -> void: dragged_cells.append(cell))
+	view.pan_by(Vector2(view.size.x, 0.0))
+	drag.position = view.cell_to_rect(restored_cell).get_center()
+	drag.button_mask = MOUSE_BUTTON_MASK_LEFT
+	view._gui_input(drag)
+	_check(drag.position.x >= view.size.x and dragged_cells.is_empty(), "captured paint drags do not edit cells clipped outside the canvas")
+	view.restore_view_state(held_view)
 
 	# A visible workbench must not hijack shortcuts in another editor panel.
 	var unrelated := LineEdit.new()
