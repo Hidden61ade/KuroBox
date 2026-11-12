@@ -2,13 +2,15 @@
 
 KuroBox 是一款用 Godot 4.6 和 GDScript 制作的拳击推箱子游戏。有八个基础关、三个进阶关和 Godot 原生关卡编辑器。
 
+解压后运行 `KuroBox.exe`。[下载 Windows 版（64 位）](https://github.com/Hidden61ade/KuroBox/releases/latest/download/KuroBox-Windows.zip)
+
 ![推箱、出拳、修改关卡与即时试关的实际演示](docs/images/demo.gif)
 
 推箱、出拳，再到编辑器修改关卡并即时试关。
 
 ## 运行游戏
 
-用 Godot 4.6 打开 `project.godot`，按 F5。Windows 导出程序在 `builds/windows/KuroBox.exe`。
+用 Godot 4.6 打开 `project.godot`，按 F5。
 
 <p>
   <img src="docs/images/main_menu.png" width="49%" alt="KuroBox 主菜单">
